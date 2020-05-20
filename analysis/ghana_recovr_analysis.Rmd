@@ -1,0 +1,186 @@
+---
+title: "Ghana RECOVR Experiment Analysis"
+author: "Molly Offer-Westort, Erika Kirgios"
+date: "5/19/2020"
+output: 
+  html_document:
+    highlight: haddock
+    theme: journal
+    number_sections: no
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  eval = TRUE,
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+```{r load_packages, include = FALSE}
+library(tidyverse)
+library(estimatr)
+```
+
+## Overivew
+The Ghana Core RECOVR project was launched [XXX] by Innovations for Poverty Action, as a nationally representative phone survey delivered to approximately 4,000 respondents. The objective of the study is to [XXX]. 
+
+The component of the study featured here is an experimental intervention included in the phone survey, with the objective of using nudges to increase information-seeking behavior. 
+
+
+Treated participants were asked to *name and reflect on someone at high risk of dying from coronavirus who they care about*. Control participants were not asked these questions. Treatment was assigned to randomly sorted telephone numbers prior to the intervention. 
+
+### Primary hypothesis.
+
+The primary hypothesis is that treated subjects will be more likely to 
+
+(1) indicate willingness to comply with recommendations for reducing the spread of coronavirus like social distancing, hand washing, etc. and 
+(2) seek more information about coronavirus. 
+
+
+
+
+## Data
+
+### Treatment and dependent variable  
+
+```{r load_data}
+dat <- read_csv('../data/ghana_recovr.csv')
+dat$treat <- 1*(dat$rand1 == 'Identifiable victim')
+```
+
+
+We have two key dependent variables: (1) behavior change intentions and (2) information seeking.
+
+*Behavior change intentions:* Participants are asked “Would you be willing to cancel social activities, avoid going to the markets and crowded places as much as possible, and wash your hands often with soap and water if possible to protect yourself, your loved ones, and other Ghanaians?” The dependent variable is a binary indicator for whether a participant responded with “Yes”. “No” and refusal to respond will both be coded as 0. 
+
+*Information seeking:* We will offer participants the opportunity to learn about a free service they can use to get more information about coronavirus. Specifically, we will tell them “The best way to protect yourself, your loved ones, and other Ghanaians is to stay informed about COVID-19 and how to prevent its spread. Would you like me to provide you with a phone number you can call to get free and accurate information about coronavirus and learn how you can keep yourself, your loved ones, and other Ghanaians safe?” The dependent variable is a binary indicator for whether participants said “Yes” to this offer. Participants who refuse to reply will be coded as 0 along with those who say “no”.
+
+*Confirm survey flow, experiment was conducted as expected:*
+
+```{r treat_flow}
+# (EXP2) Is there anyone you care about who is at high risk of dying from
+# coronavirus?
+table(dat$treat, dat$exp2, useNA = 'always')
+# (EXP3) *If YES to exp2* Can you tell me about them?
+table(dat$treat, dat$exp3, useNA = 'always')
+table(dat$exp2, dat$exp3, useNA = 'always')
+
+
+# (EXP4) *If NO to exp2* Is there anyone in your neighborhood, family or broader 
+# community who is over sixty-five or has any health problems that could put 
+# them at higher risk?
+table(dat$treat, dat$exp4, useNA = 'always')
+table(dat$exp2, dat$exp4, useNA = 'always')
+
+# (EXP5) "*If YES to exp4* Can you tell me about them?"
+table(dat$treat, dat$exp5, useNA = 'always')
+table(dat$exp2, dat$exp5, useNA = 'always')
+
+# (EXP6) *If YES to exp2 or exp4* Can you tell me a bit about why they are 
+# important to you?
+table(dat$treat, dat$exp6, useNA = 'always')
+table(dat$exp2, dat$exp6, useNA = 'always')
+table(dat$exp4, dat$exp6, useNA = 'always')
+
+# (EXP7) *If YES to exp2 or exp4*  Would you be upset if something happened to 
+# them?
+table(dat$treat, dat$exp7, useNA = 'always')
+table(dat$exp2, dat$exp7, useNA = 'always')
+table(dat$exp4, dat$exp7, useNA = 'always')
+
+# (EXP8) *If YES to exp2 or exp4* I really appreciate you sharing that. Would 
+# you be willing to cancel social activities, avoid going to the markets and 
+# crowded places as much as possible, and wash your hands often with soap and 
+# water if possible to protect yourself, your loved ones, and other Ghanaians?
+
+table(dat$treat, dat$exp8, useNA = 'always')
+table(dat$exp2, dat$exp8, useNA = 'always')
+table(dat$exp4, dat$exp8, useNA = 'always')
+
+
+# (EXP9) *If CONTROL or no to exp2 and exp4* Would you be willing to cancel 
+# social activities, avoid going to the markets and crowded places as much as
+# possible, and wash your hands often with soap and water if possible to protect
+# yourself, your loved ones, and other Ghanaians?
+
+table(dat$treat, dat$exp9, useNA = 'always')
+table(dat$exp2, dat$exp9, useNA = 'always')
+table(dat$exp4, dat$exp9, useNA = 'always')
+
+
+# (EXP10) The best way to protect yourself, your loved ones, and other Ghanaians 
+# is to stay informed about COVID-19 and how to prevent its spread. Would you 
+# like me to provide you with a phone number you can call to get free and 
+# accurate information about coronavirus and learn how you can keep yourself, 
+# your loved ones, and other Ghanaians safe? 
+
+table(dat$treat, dat$exp10, useNA = 'always')
+
+# Code outcome variables
+dat$Y_behav <- 1*(coalesce(dat$exp8, dat$exp9)=='Yes')
+table(dat$Y_behav)
+
+dat$Y_info <- dat$exp10
+table(dat$Y_info)
+
+```
+
+### Cleaning
+
+We will include the following control variables in our analysis: an indicator for being male, a continuous measure of age, indicators for region, indicators for education level, an indicator for whether the participant’s household is below poverty level, an indicator for the phone surveyor who administered the survey, indicators for consent version (government, research, or policymaker beneficiary), and an indicator for the date when the phone survey was initiated. 
+
+For categorical variables (e.g., gender, education, region, etc) where information is missing, we will add a category for “Unknown”. When information is missing for continuous variables, we will fill in the missing information with the dataset average for that category and add a missing indicator for the variable in question. Thus, if someone’s age is missing and the average age in the dataset is 65.7, we will fill in the missing information with 65.7 and a “Missing Age” indicator will take on a value of 1 for that observation.
+
+
+```{r cleaning}
+# In progress
+
+```
+
+[[To be added: summary tables, balance tables]]
+
+```{r balance}
+# In progress
+
+```
+
+### Analysis
+
+For each of our key DV’s, we plan to run an ordinary least squares (OLS) regression with robust standard errors predicting the dependent variable with an indicator for assignment to our treatment condition (this will be our primary predictor variable).
+
+ 
+
+```{r}
+
+```
+
+
+
+As a robustness check, we will also test all our models using logistic regression rather than OLS regression. We will also report a simple difference in means for all our DVs (without any controls). 
+
+Finally, for each DV, we will also report the Lin Estimator: an estimate of our OLS regression model where we include the interaction between an indicator for our treatment and all pre-treatment covariates. 
+
+
+```{r lin}
+
+```
+
+As exploratory analyses, we will test the following potential moderators for the effect of treatment on each of our DV’s: gender and education level. To test these hypotheses, we will run the regression described in Section 5 above with an added interaction between our treatment indicator and an indicator for the moderator being tested (gender or education level). 
+
+## Additional information
+
+*Outliers and Exclusions.* 
+
+Anyone who fails to reach the section of the phone survey where random assignment would change their experience will be excluded from the study.  Anyone who hears even the beginning of a script that differs due to random assignment will be included and assigned 0’s for both dependent variables if they drop out before dependent variables are collected.
+
+
+
+*Further research*
+
+After this phone survey, participants will be asked whether they want to opt-in to receive text messages with information and questions about coronavirus over a four week period. We will test whether our treatment affects willingness to opt-in to receive these messages using an OLS regression with robust standard errors, as described above. 
+
+We will attempt to call participants for a final phone survey about six weeks after this initial phone survey. We will test whether our treatment affects their reported behaviors and beliefs about coronavirus in that final survey as well as their likelihood to agree to take the second survey. The contents of this second phone survey will not be finalized until after the launch of the original phone survey, so these analyses will be considered exploratory. We plan to use OLS regressions with the same control variables as listed above (in section 5) to conduct these analyses. 
