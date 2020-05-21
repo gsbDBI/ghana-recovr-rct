@@ -1,7 +1,7 @@
 ---
-title: "Ghana RECOVR Experiment Analysis"
-author: "Molly Offer-Westort, Erika Kirgios"
-date: "5/19/2020"
+title: 'Ghana RECOVR Experiment Analysis'
+author: 'Molly Offer-Westort, Erika Kirgios'
+date: '5/19/2020'
 output: 
   html_document:
     keep_md: true
@@ -16,13 +16,13 @@ output:
 <style>
 
 table, td, th {
-  border: none;
-  padding-left: 1em;
-  padding-right: 1em;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 1em;
-  margin-bottom: 1em;
+border: none;
+padding-left: 1em;
+padding-right: 1em;
+margin-left: auto;
+margin-right: auto;
+margin-top: 1em;
+margin-bottom: 1em;
 }
 
 </style>
@@ -38,10 +38,54 @@ The Ghana Core RECOVR project was launched [XXX] by Innovations for Poverty Acti
 
 The component of the study featured here is an experimental intervention included in the phone survey, with the objective of using nudges to increase information-seeking behavior. 
 
+*The script of the Ghana Core RECOVR survey is linked  [here](https://docs.google.com/spreadsheets/d/1uqAGQHUpbxKGCtAXBXmUp77TwE52Rk0PZgYN2J-WXuo/edit?usp=sharing).*
+
+# Survey overview
+
+** DATA LAST DOWNLOADED 5/21/20**
+
+## Demographics
+
+Selected questions. 
+
+**[[To add: income/poverty distribution]]**
+
+![](ghana_recovr_analysis_files/figure-html/overview-1.png)<!-- -->![](ghana_recovr_analysis_files/figure-html/overview-2.png)<!-- -->![](ghana_recovr_analysis_files/figure-html/overview-3.png)<!-- -->![](ghana_recovr_analysis_files/figure-html/overview-4.png)<!-- -->
+
+
+
+## COVID-19 
+Selected questions. 
+
+*In the past 7 days, how many days did members of your household go to a market or food store?*
+![](ghana_recovr_analysis_files/figure-html/covid3-1.png)<!-- -->
+
+*In the past 7 days, have you washed your hands with soap and water more often, less often, or about the same as you did before mid-March (or before government closed schools)?*
+![](ghana_recovr_analysis_files/figure-html/covid4-1.png)<!-- -->
+
+*In the last 7 days have you worn any type of face mask? If yes, what type?*
+![](ghana_recovr_analysis_files/figure-html/covid5-1.png)<!-- -->
+
+*In the last 7 days, why have you not worn a facemask?*
+![](ghana_recovr_analysis_files/figure-html/covid6-1.png)<!-- -->
+
+*Do you feel that you or anyone in your household is at risk of contracting covid-19?*
+![](ghana_recovr_analysis_files/figure-html/covid7-1.png)<!-- -->
+
+*If NO to COV7...Why do you feel that your household is not at risk of contracting covid-19?*
+![](ghana_recovr_analysis_files/figure-html/covid8-1.png)<!-- -->
+
+*Do you think the reaction of your country’s government to the current coronavirus outbreak is appropriate, too extreme, or not sufficient?*
+![](ghana_recovr_analysis_files/figure-html/covid9-1.png)<!-- -->
+
+*What is your main source of concern related to the effects of the Coronavirus crisis on Ghanaians?*
+![](ghana_recovr_analysis_files/figure-html/covid10-1.png)<!-- -->
+
+# Experiment
 
 Treated participants were asked to *name and reflect on someone at high risk of dying from coronavirus who they care about*. Control participants were not asked these questions. Treatment was assigned to randomly sorted telephone numbers prior to the intervention. 
 
-*The script of the Ghana Core RECOVR survey is linked  [here](https://docs.google.com/spreadsheets/d/1uqAGQHUpbxKGCtAXBXmUp77TwE52Rk0PZgYN2J-WXuo/edit?usp=sharing).*
+
 
 
 ### Primary hypothesis
@@ -52,15 +96,12 @@ The primary hypothesis is that treated subjects will be more likely to
 (2) seek more information about coronavirus. 
 
 
-
-
 ## Data
 
 ### Treatment and dependent variable  
 
 
 ```r
-dat <- read_csv('../data/ghana_recovr.csv')
 dat$treat <- 1*(dat$rand1 == 'Identifiable victim')
 
 # some people did not recieve treatment assignment
@@ -70,7 +111,7 @@ table(dat$treat, useNA = 'ifany')
 ```
 ## 
 ##    0    1 <NA> 
-##  402  370   28
+##  600  573   29
 ```
 
 ```r
@@ -101,8 +142,8 @@ table(dat$treat, dat$exp2, useNA = 'ifany')
 ```
 ##    
 ##      No Yes <NA>
-##   0   0   0  402
-##   1 294  76    0
+##   0   0   0  600
+##   1 454 119    0
 ```
 
 ```r
@@ -114,9 +155,9 @@ table(dat$exp2, dat$exp3, useNA = 'ifany')
 ```
 ##       
 ##        Yes, respondent thinks of or identifies an individual <NA>
-##   No                                                       0  294
-##   Yes                                                     76    0
-##   <NA>                                                     0  402
+##   No                                                       0  454
+##   Yes                                                    119    0
+##   <NA>                                                     0  600
 ```
 
 ```r
@@ -130,15 +171,15 @@ table(dat$exp2, dat$exp4, useNA = 'ifany')
 
 ```
 ##       
-##         No Refuses to Answer Yes <NA>
-##   No   261                 2  31    0
-##   Yes    0                 0   0   76
-##   <NA>   0                 0   0  402
+##         .r  No Yes <NA>
+##   No     6 394  54    0
+##   Yes    0   0   0  119
+##   <NA>   0   0   0  600
 ```
 
 ```r
 # *Treatment delivery
-# (EXP5) "*If YES to exp4* Can you tell me about them?"
+# (EXP5) '*If YES to exp4* Can you tell me about them?'
 # - confirm only responses for those individuals that responeded 'no' to exp4 
 table(dat$exp2, dat$exp5, useNA = 'ifany')
 ```
@@ -146,9 +187,9 @@ table(dat$exp2, dat$exp5, useNA = 'ifany')
 ```
 ##       
 ##        Yes, respondent thinks of or identifies an individual <NA>
-##   No                                                      31  263
-##   Yes                                                      0   76
-##   <NA>                                                     0  402
+##   No                                                      54  400
+##   Yes                                                      0  119
+##   <NA>                                                     0  600
 ```
 
 ```r
@@ -162,14 +203,14 @@ table(dat$exp2, dat$exp6, useNA = 'ifany')
 ```
 ##       
 ##        Refused, respondent didn't say anything
-##   No                                         3
-##   Yes                                        4
+##   No                                         4
+##   Yes                                        6
 ##   <NA>                                       0
 ##       
 ##        Yes, respondent thinks of or identifies an individual <NA>
-##   No                                                      28  263
-##   Yes                                                     72    0
-##   <NA>                                                     0  402
+##   No                                                      50  400
+##   Yes                                                    113    0
+##   <NA>                                                     0  600
 ```
 
 ```r
@@ -177,24 +218,18 @@ table(dat$exp4, dat$exp6, useNA = 'ifany')
 ```
 
 ```
-##                    
-##                     Refused, respondent didn't say anything
-##   No                                                      0
-##   Refuses to Answer                                       0
-##   Yes                                                     3
-##   <NA>                                                    4
-##                    
-##                     Yes, respondent thinks of or identifies an individual
-##   No                                                                    0
-##   Refuses to Answer                                                     0
-##   Yes                                                                  28
-##   <NA>                                                                 72
-##                    
-##                     <NA>
-##   No                 261
-##   Refuses to Answer    2
-##   Yes                  0
-##   <NA>               402
+##       
+##        Refused, respondent didn't say anything
+##   .r                                         0
+##   No                                         0
+##   Yes                                        4
+##   <NA>                                       6
+##       
+##        Yes, respondent thinks of or identifies an individual <NA>
+##   .r                                                       0    6
+##   No                                                       0  394
+##   Yes                                                     50    0
+##   <NA>                                                   113  600
 ```
 
 ```r
@@ -207,10 +242,10 @@ table(dat$exp2, dat$exp7, useNA = 'ifany')
 
 ```
 ##       
-##         No Yes <NA>
-##   No     1  30  263
-##   Yes    4  72    0
-##   <NA>   0   0  402
+##         .r  No Yes <NA>
+##   No     1   2  51  400
+##   Yes    0   4 115    0
+##   <NA>   0   0   0  600
 ```
 
 ```r
@@ -218,12 +253,12 @@ table(dat$exp4, dat$exp7, useNA = 'ifany')
 ```
 
 ```
-##                    
-##                      No Yes <NA>
-##   No                  0   0  261
-##   Refuses to Answer   0   0    2
-##   Yes                 1  30    0
-##   <NA>                4  72  402
+##       
+##         .r  No Yes <NA>
+##   .r     0   0   0    6
+##   No     0   0   0  394
+##   Yes    1   2  51    0
+##   <NA>   0   4 115  600
 ```
 
 ```r
@@ -239,9 +274,9 @@ table(dat$exp2, dat$exp8, useNA = 'ifany')
 ```
 ##       
 ##         No Yes <NA>
-##   No     1  30  263
-##   Yes    3  73    0
-##   <NA>   0   0  402
+##   No     1  53  400
+##   Yes    4 115    0
+##   <NA>   0   0  600
 ```
 
 ```r
@@ -249,12 +284,12 @@ table(dat$exp4, dat$exp8, useNA = 'ifany')
 ```
 
 ```
-##                    
-##                      No Yes <NA>
-##   No                  0   0  261
-##   Refuses to Answer   0   0    2
-##   Yes                 1  30    0
-##   <NA>                3  73  402
+##       
+##         No Yes <NA>
+##   .r     0   0    6
+##   No     0   0  394
+##   Yes    1  53    0
+##   <NA>   4 115  600
 ```
 
 ```r
@@ -270,9 +305,9 @@ table(dat$treat, dat$exp9, useNA = 'ifany')
 
 ```
 ##    
-##     Don't know  No Yes <NA>
-##   0          1  24 377    0
-##   1          1  14 248  107
+##      .d  No Yes <NA>
+##   0   1  31 568    0
+##   1   1  27 372  173
 ```
 
 ```r
@@ -281,10 +316,10 @@ table(dat$exp2, dat$exp9, useNA = 'ifany')
 
 ```
 ##       
-##        Don't know  No Yes <NA>
-##   No            1  14 248   31
-##   Yes           0   0   0   76
-##   <NA>          1  24 377    0
+##         .d  No Yes <NA>
+##   No     1  27 372   54
+##   Yes    0   0   0  119
+##   <NA>   1  31 568    0
 ```
 
 ```r
@@ -292,12 +327,12 @@ table(dat$exp4, dat$exp9, useNA = 'ifany')
 ```
 
 ```
-##                    
-##                     Don't know  No Yes <NA>
-##   No                         1  14 246    0
-##   Refuses to Answer          0   0   2    0
-##   Yes                        0   0   0   31
-##   <NA>                       1  24 377   76
+##       
+##         .d  No Yes <NA>
+##   .r     0   0   6    0
+##   No     1  27 366    0
+##   Yes    0   0   0   54
+##   <NA>   1  31 568  119
 ```
 
 ```r
@@ -312,8 +347,8 @@ table(dat$exp10, useNA = 'ifany')
 
 ```
 ## 
-##  No Yes 
-##  71 701
+##   No  Yes 
+##  108 1065
 ```
 
 ```r
@@ -325,8 +360,8 @@ table(dat$treat, dat$Y_behav)
 ```
 ##    
 ##       0   1
-##   0  25 377
-##   1  19 351
+##   0  32 568
+##   1  33 540
 ```
 
 ```r
@@ -337,8 +372,8 @@ table(dat$treat, dat$Y_info)
 ```
 ##    
 ##       0   1
-##   0  36 366
-##   1  35 335
+##   0  60 540
+##   1  48 525
 ```
 
 ### Cleaning
@@ -366,7 +401,7 @@ dat$reg <- dat$region <- factor(dat$dem3) # creates factor for region
 dat <- dat %>% # creates region dummies
   mutate(dummy = 1) %>% 
   spread(key = reg,
-         sep = "_",
+         sep = '_',
          value = dummy,
          fill = 0
   ) %>% # mean-centered variables for regions
@@ -378,7 +413,7 @@ dat$ed <- dat$education <- factor(dat$dem11) # creates factor for education
 dat <- dat %>%
   mutate(dummy = 1) %>% 
   spread(key = ed,
-         sep = "_",
+         sep = '_',
          value = dummy,
          fill = 0
   ) %>%
@@ -387,8 +422,9 @@ dat <- dat %>%
 
 # indicator for whether the participant’s household is below poverty level
 dat$pov_level <- 1*(dat$pov1 == 'a') # !!!CONFIRM!!!
-dat$pov_level_flag <- 1*(dat$pov1 == -888 | dat$pov1 == -999)
-dat$pov_level_c <- dat$pov_level - mean(dat$pov_level)
+dat$pov_level[which(is.na(dat$pov1))] <- 0
+dat$pov_level_flag <- 1*(dat$pov1 == -888 | dat$pov1 == -999 | is.na(dat$pov1))
+dat$pov_level_c <- dat$pov_level - mean(dat$pov_level, na.rm = TRUE)
 dat$pov_level_flag_c <- dat$pov_level_flag - mean(dat$pov_level_flag)
 
 # indicator for the phone surveyor who administered the survey
@@ -396,7 +432,7 @@ dat$sv <- dat$surveyor <- factor(dat$survyeorid)
 dat <- dat %>%
   mutate(dummy = 1) %>% 
   spread(key = sv,
-         sep = "_",
+         sep = '_',
          value = dummy,
          fill = 0
   ) %>%
@@ -407,7 +443,7 @@ dat$cv <- dat$consent_version <- factor(dat$cons_rand_vers)
 dat <- dat %>% 
   mutate(dummy = 1) %>% 
   spread(key = cv,
-         sep = "_",
+         sep = '_',
          value = dummy,
          fill = 0
   ) %>% 
@@ -418,7 +454,7 @@ dat$dt <- dat$int_date <- factor(dat$date)
 dat <- dat %>% 
   mutate(dummy = 1) %>% 
   spread(key = dt,
-         sep = "_",
+         sep = '_',
          value = dummy,
          fill = 0
   ) %>% 
@@ -472,9 +508,9 @@ glm2i_log <- glm(Y_info ~ treat +
 
 # Stated behavioral outcomes
 
-# OLS
+# Difference in means
 lm1b_ols <- lm(Y_behav ~ treat, data = dat)
-
+# OLS adjusted
 lm2b_ols <- lm(Y_behav ~ treat +
                  male + male_flag + age + age_flag + region + education + 
                  pov_level + pov_level_flag + surveyor + consent_version +
@@ -505,8 +541,8 @@ glm2b_log <- glm(Y_behav ~ treat +
 stargazer(lm1i_ols, lm2i_ols, lm4i_lin, glm1i_log, glm2i_log, type = 'html',
           # Standard errors are HC2
           se = list(sqrt(diag(vcov(lm1i_ols, type = 'HC2'))),
-              sqrt(diag(vcov(lm2i_ols, type = 'HC2'))),
-              sqrt(diag(vcov(lm4i_lin, type = 'HC2')))),
+                    sqrt(diag(vcov(lm2i_ols, type = 'HC2'))),
+                    sqrt(diag(vcov(lm4i_lin, type = 'HC2')))),
           add.lines = 
             list(c('Covariate adjusted', 'No', 'Yes','Yes (Lin)', 'No', 'Yes')), 
           keep = c('^Constant$', '^treat$'),
@@ -521,25 +557,25 @@ stargazer(lm1i_ols, lm2i_ols, lm4i_lin, glm1i_log, glm2i_log, type = 'html',
 <tr><td style="text-align:left"></td><td colspan="5">Information-Seeking Outcome</td></tr>
 <tr><td style="text-align:left"></td><td colspan="3"><em>OLS</em></td><td colspan="2"><em>logistic</em></td></tr>
 <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td><td>(5)</td></tr>
-<tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Identifiable Victim</td><td>-0.005</td><td>-0.011</td><td>-0.013</td><td>-0.060</td><td>-0.236</td></tr>
-<tr><td style="text-align:left"></td><td>(0.021)</td><td>(0.021)</td><td>(0.021)</td><td>(0.249)</td><td>(0.304)</td></tr>
+<tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Identifiable Victim</td><td>0.016</td><td>0.010</td><td>0.005</td><td>0.195</td><td>-0.008</td></tr>
+<tr><td style="text-align:left"></td><td>(0.017)</td><td>(0.017)</td><td>(0.017)</td><td>(0.203)</td><td>(0.240)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">Constant</td><td>0.910<sup>***</sup></td><td>0.744<sup>***</sup></td><td>0.914<sup>***</sup></td><td>2.319<sup>***</sup></td><td>0.819</td></tr>
-<tr><td style="text-align:left"></td><td>(0.014)</td><td>(0.159)</td><td>(0.014)</td><td>(0.175)</td><td>(2.072)</td></tr>
+<tr><td style="text-align:left">Constant</td><td>0.900<sup>***</sup></td><td>0.937<sup>***</sup></td><td>0.906<sup>***</sup></td><td>2.197<sup>***</sup></td><td>18.349</td></tr>
+<tr><td style="text-align:left"></td><td>(0.012)</td><td>(0.174)</td><td>(0.012)</td><td>(0.136)</td><td>(5,311.326)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Covariate adjusted</td><td>No</td><td>Yes</td><td>Yes (Lin)</td><td>No</td><td>Yes</td></tr>
-<tr><td style="text-align:left">Observations</td><td>772</td><td>772</td><td>772</td><td>772</td><td>772</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.0001</td><td>0.163</td><td>0.239</td><td></td><td></td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>-0.001</td><td>0.090</td><td>0.096</td><td></td><td></td></tr>
-<tr><td style="text-align:left">Log Likelihood</td><td></td><td></td><td></td><td>-237.028</td><td>-164.795</td></tr>
+<tr><td style="text-align:left">Observations</td><td>1,173</td><td>1,166</td><td>1,173</td><td>1,173</td><td>1,166</td></tr>
+<tr><td style="text-align:left">R<sup>2</sup></td><td>0.001</td><td>0.147</td><td>0.187</td><td></td><td></td></tr>
+<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>-0.0001</td><td>0.096</td><td>0.086</td><td></td><td></td></tr>
+<tr><td style="text-align:left">Log Likelihood</td><td></td><td></td><td></td><td>-360.006</td><td>-261.014</td></tr>
 <tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="5" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
 </table>
 
 ```r
 stargazer(lm1b_ols, lm2b_ols, lm4b_lin, glm1b_log, glm2b_log, type = 'html', 
           se = list(sqrt(diag(vcov(lm1b_ols, type = 'HC2'))),
-              sqrt(diag(vcov(lm2b_ols, type = 'HC2'))),
-              sqrt(diag(vcov(lm4b_lin, type = 'HC2')))),
+                    sqrt(diag(vcov(lm2b_ols, type = 'HC2'))),
+                    sqrt(diag(vcov(lm4b_lin, type = 'HC2')))),
           add.lines = 
             list(c('Covariate adjusted', 'No', 'Yes','Yes (Lin)', 'No', 'Yes')), 
           keep = c('^Constant$', '^treat$'),
@@ -554,17 +590,17 @@ stargazer(lm1b_ols, lm2b_ols, lm4b_lin, glm1b_log, glm2b_log, type = 'html',
 <tr><td style="text-align:left"></td><td colspan="5">Behavioral Outcome</td></tr>
 <tr><td style="text-align:left"></td><td colspan="3"><em>OLS</em></td><td colspan="2"><em>logistic</em></td></tr>
 <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td><td>(5)</td></tr>
-<tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Identifiable Victim</td><td>0.011</td><td>0.011</td><td>0.010</td><td>0.203</td><td>0.289</td></tr>
-<tr><td style="text-align:left"></td><td>(0.017)</td><td>(0.016)</td><td>(0.016)</td><td>(0.313)</td><td>(0.399)</td></tr>
+<tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Identifiable Victim</td><td>-0.004</td><td>-0.004</td><td>-0.006</td><td>-0.081</td><td>-0.102</td></tr>
+<tr><td style="text-align:left"></td><td>(0.013)</td><td>(0.013)</td><td>(0.013)</td><td>(0.255)</td><td>(0.316)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">Constant</td><td>0.938<sup>***</sup></td><td>0.508<sup>***</sup></td><td>0.937<sup>***</sup></td><td>2.713<sup>***</sup></td><td>15.217</td></tr>
-<tr><td style="text-align:left"></td><td>(0.012)</td><td>(0.124)</td><td>(0.011)</td><td>(0.207)</td><td>(5,667.476)</td></tr>
+<tr><td style="text-align:left">Constant</td><td>0.947<sup>***</sup></td><td>0.748<sup>***</sup></td><td>0.946<sup>***</sup></td><td>2.876<sup>***</sup></td><td>36.342</td></tr>
+<tr><td style="text-align:left"></td><td>(0.009)</td><td>(0.132)</td><td>(0.009)</td><td>(0.182)</td><td>(9,235.670)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Covariate adjusted</td><td>No</td><td>Yes</td><td>Yes (Lin)</td><td>No</td><td>Yes</td></tr>
-<tr><td style="text-align:left">Observations</td><td>772</td><td>772</td><td>772</td><td>772</td><td>772</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.001</td><td>0.201</td><td>0.255</td><td></td><td></td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>-0.001</td><td>0.131</td><td>0.115</td><td></td><td></td></tr>
-<tr><td style="text-align:left">Log Likelihood</td><td></td><td></td><td></td><td>-168.561</td><td>-110.235</td></tr>
+<tr><td style="text-align:left">Observations</td><td>1,173</td><td>1,166</td><td>1,173</td><td>1,173</td><td>1,166</td></tr>
+<tr><td style="text-align:left">R<sup>2</sup></td><td>0.0001</td><td>0.226</td><td>0.250</td><td></td><td></td></tr>
+<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>-0.001</td><td>0.180</td><td>0.157</td><td></td><td></td></tr>
+<tr><td style="text-align:left">Log Likelihood</td><td></td><td></td><td></td><td>-251.155</td><td>-166.899</td></tr>
 <tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="5" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
 </table>
 
@@ -577,32 +613,32 @@ As exploratory analyses, we will test the following potential moderators for the
 ```r
 lm1i_ols_g <- lm(Y_info ~ treat*male, data = dat)
 lm2i_ols_g <- lm(Y_info ~ treat*male 
-               + male_flag + age + age_flag + region + education + 
-                 pov_level + pov_level_flag + surveyor + consent_version +
-                 int_date, 
-               data = dat)
+                 + male_flag + age + age_flag + region + education + 
+                   pov_level + pov_level_flag + surveyor + consent_version +
+                   int_date, 
+                 data = dat)
 
 lm1i_ols_e <- lm(Y_info ~ treat*education, data = dat)
 lm2i_ols_e <- lm(Y_info ~ treat*education +
-                 male + male_flag + age + age_flag + region +
-                 pov_level + pov_level_flag + surveyor + consent_version +
-                 int_date, 
-               data = dat)
+                   male + male_flag + age + age_flag + region +
+                   pov_level + pov_level_flag + surveyor + consent_version +
+                   int_date, 
+                 data = dat)
 
 
 lm1b_ols_g <- lm(Y_info ~ treat*male, data = dat)
 lm2b_ols_g <- lm(Y_info ~ treat*male 
-               + male_flag + age + age_flag + region + education + 
-                 pov_level + pov_level_flag + surveyor + consent_version +
-                 int_date, 
-               data = dat)
+                 + male_flag + age + age_flag + region + education + 
+                   pov_level + pov_level_flag + surveyor + consent_version +
+                   int_date, 
+                 data = dat)
 
 lm1b_ols_e <- lm(Y_info ~ treat*education, data = dat)
 lm2b_ols_e <- lm(Y_info ~ treat*education +
-                 male + male_flag + age + age_flag + region +
-                 pov_level + pov_level_flag + surveyor + consent_version +
-                 int_date, 
-               data = dat)
+                   male + male_flag + age + age_flag + region +
+                   pov_level + pov_level_flag + surveyor + consent_version +
+                   int_date, 
+                 data = dat)
 ```
 
 
@@ -612,9 +648,9 @@ stargazer(lm1i_ols_g, lm2i_ols_g, lm1i_ols_e, lm2i_ols_e,
           type = 'html',
           # Standard errors are HC2
           se = list(sqrt(diag(vcov(lm1i_ols_g, type = 'HC2'))),
-              sqrt(diag(vcov(lm2i_ols_g, type = 'HC2'))),
-              sqrt(diag(vcov(lm1i_ols_e, type = 'HC2'))),
-              sqrt(diag(vcov(lm2i_ols_e, type = 'HC2')))),
+                    sqrt(diag(vcov(lm2i_ols_g, type = 'HC2'))),
+                    sqrt(diag(vcov(lm1i_ols_e, type = 'HC2'))),
+                    sqrt(diag(vcov(lm2i_ols_e, type = 'HC2')))),
           add.lines = 
             list(c('Covariate adjusted', 'No', 'Yes', 'No', 'Yes'),
                  c('Moderator', 'Male', 'Male', 'Ed.', 'Ed.')), 
@@ -629,44 +665,44 @@ stargazer(lm1i_ols_g, lm2i_ols_g, lm1i_ols_e, lm2i_ols_e,
 <tr><td></td><td colspan="4" style="border-bottom: 1px solid black"></td></tr>
 <tr><td style="text-align:left"></td><td colspan="4">Information-Seeking Outcome</td></tr>
 <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td></tr>
-<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">treat</td><td>0.004</td><td>-0.007</td><td>0.400<sup>**</sup></td><td>0.477<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.033)</td><td>(0.033)</td><td>(0.183)</td><td>(0.179)</td></tr>
+<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">treat</td><td>0.011</td><td>0.009</td><td>-0.000</td><td>0.036</td></tr>
+<tr><td style="text-align:left"></td><td>(0.027)</td><td>(0.027)</td><td>(0.333)</td><td>(0.326)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">male</td><td>0.039</td><td>0.022</td><td></td><td>0.018</td></tr>
-<tr><td style="text-align:left"></td><td>(0.030)</td><td>(0.030)</td><td></td><td>(0.021)</td></tr>
+<tr><td style="text-align:left">male</td><td>0.025</td><td>0.015</td><td></td><td>0.016</td></tr>
+<tr><td style="text-align:left"></td><td>(0.024)</td><td>(0.024)</td><td></td><td>(0.017)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="text-align:left">male_flag</td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:male</td><td>-0.014</td><td>-0.008</td><td></td><td></td></tr>
-<tr><td style="text-align:left"></td><td>(0.043)</td><td>(0.042)</td><td></td><td></td></tr>
+<tr><td style="text-align:left">treat:male</td><td>0.007</td><td>0.001</td><td></td><td></td></tr>
+<tr><td style="text-align:left"></td><td>(0.035)</td><td>(0.034)</td><td></td><td></td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationMiddle/ Junior High</td><td></td><td></td><td>-0.426<sup>**</sup></td><td>-0.488<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.188)</td><td>(0.184)</td></tr>
+<tr><td style="text-align:left">treat:educationKindergarten</td><td></td><td></td><td>0.286</td><td>0.268</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.365)</td><td>(0.357)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationNone</td><td></td><td></td><td>-0.300</td><td>-0.394<sup>*</sup></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.209)</td><td>(0.206)</td></tr>
+<tr><td style="text-align:left">treat:educationMiddle/ Junior High</td><td></td><td></td><td>-0.011</td><td>-0.037</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.335)</td><td>(0.328)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationPost-Secondary</td><td></td><td></td><td>-0.425<sup>**</sup></td><td>-0.528<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.187)</td><td>(0.183)</td></tr>
+<tr><td style="text-align:left">treat:educationNone</td><td></td><td></td><td>0.107</td><td>0.011</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.343)</td><td>(0.335)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationPrimary</td><td></td><td></td><td>-0.487<sup>**</sup></td><td>-0.600<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.202)</td><td>(0.198)</td></tr>
+<tr><td style="text-align:left">treat:educationPost-Secondary</td><td></td><td></td><td>0.004</td><td>-0.048</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.335)</td><td>(0.328)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationRefuses to Answer</td><td></td><td></td><td>-0.400</td><td>-0.481</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.448)</td><td>(0.440)</td></tr>
+<tr><td style="text-align:left">treat:educationPrimary</td><td></td><td></td><td>-0.082</td><td>-0.135</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.342)</td><td>(0.334)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationSecondary or Vocational</td><td></td><td></td><td>-0.386<sup>**</sup></td><td>-0.464<sup>**</sup></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.186)</td><td>(0.182)</td></tr>
+<tr><td style="text-align:left">treat:educationSecondary or Vocational</td><td></td><td></td><td>0.037</td><td>-0.003</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.335)</td><td>(0.328)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">Constant</td><td>0.887<sup>***</sup></td><td>0.742<sup>***</sup></td><td>0.600<sup>***</sup></td><td>0.500<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.023)</td><td>(0.159)</td><td>(0.129)</td><td>(0.182)</td></tr>
+<tr><td style="text-align:left">Constant</td><td>0.885<sup>***</sup></td><td>0.938<sup>***</sup></td><td>1.000<sup>***</sup></td><td>0.917<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(0.019)</td><td>(0.175)</td><td>(0.289)</td><td>(0.295)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
 <tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Covariate adjusted</td><td>No</td><td>Yes</td><td>No</td><td>Yes</td></tr>
 <tr><td style="text-align:left">Moderator</td><td>Male</td><td>Male</td><td>Ed.</td><td>Ed.</td></tr>
-<tr><td style="text-align:left">Observations</td><td>772</td><td>772</td><td>772</td><td>772</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.003</td><td>0.163</td><td>0.017</td><td>0.177</td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>-0.001</td><td>0.089</td><td>-0.0001</td><td>0.098</td></tr>
+<tr><td style="text-align:left">Observations</td><td>1,173</td><td>1,166</td><td>1,173</td><td>1,166</td></tr>
+<tr><td style="text-align:left">R<sup>2</sup></td><td>0.003</td><td>0.147</td><td>0.014</td><td>0.153</td></tr>
+<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.001</td><td>0.095</td><td>0.003</td><td>0.097</td></tr>
 <tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="4" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
 </table>
 
@@ -675,9 +711,9 @@ stargazer(lm1b_ols_g, lm2b_ols_g, lm1b_ols_e, lm2b_ols_e,
           type = 'html',
           # Standard errors are HC2
           se = list(sqrt(diag(vcov(lm1b_ols_g, type = 'HC2'))),
-              sqrt(diag(vcov(lm2b_ols_g, type = 'HC2'))),
-              sqrt(diag(vcov(lm1b_ols_e, type = 'HC2'))),
-              sqrt(diag(vcov(lm2b_ols_e, type = 'HC2')))),
+                    sqrt(diag(vcov(lm2b_ols_g, type = 'HC2'))),
+                    sqrt(diag(vcov(lm1b_ols_e, type = 'HC2'))),
+                    sqrt(diag(vcov(lm2b_ols_e, type = 'HC2')))),
           add.lines = 
             list(c('Covariate adjusted', 'No', 'Yes', 'No', 'Yes'),
                  c('Moderator', 'Male', 'Male', 'Ed.', 'Ed.')), 
@@ -692,44 +728,44 @@ stargazer(lm1b_ols_g, lm2b_ols_g, lm1b_ols_e, lm2b_ols_e,
 <tr><td></td><td colspan="4" style="border-bottom: 1px solid black"></td></tr>
 <tr><td style="text-align:left"></td><td colspan="4">Behavioral Outcome</td></tr>
 <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td></tr>
-<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">treat</td><td>0.004</td><td>-0.007</td><td>0.400<sup>**</sup></td><td>0.477<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.033)</td><td>(0.033)</td><td>(0.183)</td><td>(0.179)</td></tr>
+<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">treat</td><td>0.011</td><td>0.009</td><td>-0.000</td><td>0.036</td></tr>
+<tr><td style="text-align:left"></td><td>(0.027)</td><td>(0.027)</td><td>(0.333)</td><td>(0.326)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">male</td><td>0.039</td><td>0.022</td><td></td><td>0.018</td></tr>
-<tr><td style="text-align:left"></td><td>(0.030)</td><td>(0.030)</td><td></td><td>(0.021)</td></tr>
+<tr><td style="text-align:left">male</td><td>0.025</td><td>0.015</td><td></td><td>0.016</td></tr>
+<tr><td style="text-align:left"></td><td>(0.024)</td><td>(0.024)</td><td></td><td>(0.017)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="text-align:left">male_flag</td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:male</td><td>-0.014</td><td>-0.008</td><td></td><td></td></tr>
-<tr><td style="text-align:left"></td><td>(0.043)</td><td>(0.042)</td><td></td><td></td></tr>
+<tr><td style="text-align:left">treat:male</td><td>0.007</td><td>0.001</td><td></td><td></td></tr>
+<tr><td style="text-align:left"></td><td>(0.035)</td><td>(0.034)</td><td></td><td></td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationMiddle/ Junior High</td><td></td><td></td><td>-0.426<sup>**</sup></td><td>-0.488<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.188)</td><td>(0.184)</td></tr>
+<tr><td style="text-align:left">treat:educationKindergarten</td><td></td><td></td><td>0.286</td><td>0.268</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.365)</td><td>(0.357)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationNone</td><td></td><td></td><td>-0.300</td><td>-0.394<sup>*</sup></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.209)</td><td>(0.206)</td></tr>
+<tr><td style="text-align:left">treat:educationMiddle/ Junior High</td><td></td><td></td><td>-0.011</td><td>-0.037</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.335)</td><td>(0.328)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationPost-Secondary</td><td></td><td></td><td>-0.425<sup>**</sup></td><td>-0.528<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.187)</td><td>(0.183)</td></tr>
+<tr><td style="text-align:left">treat:educationNone</td><td></td><td></td><td>0.107</td><td>0.011</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.343)</td><td>(0.335)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationPrimary</td><td></td><td></td><td>-0.487<sup>**</sup></td><td>-0.600<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.202)</td><td>(0.198)</td></tr>
+<tr><td style="text-align:left">treat:educationPost-Secondary</td><td></td><td></td><td>0.004</td><td>-0.048</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.335)</td><td>(0.328)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationRefuses to Answer</td><td></td><td></td><td>-0.400</td><td>-0.481</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.448)</td><td>(0.440)</td></tr>
+<tr><td style="text-align:left">treat:educationPrimary</td><td></td><td></td><td>-0.082</td><td>-0.135</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.342)</td><td>(0.334)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationSecondary or Vocational</td><td></td><td></td><td>-0.386<sup>**</sup></td><td>-0.464<sup>**</sup></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.186)</td><td>(0.182)</td></tr>
+<tr><td style="text-align:left">treat:educationSecondary or Vocational</td><td></td><td></td><td>0.037</td><td>-0.003</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.335)</td><td>(0.328)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">Constant</td><td>0.887<sup>***</sup></td><td>0.742<sup>***</sup></td><td>0.600<sup>***</sup></td><td>0.500<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.023)</td><td>(0.159)</td><td>(0.129)</td><td>(0.182)</td></tr>
+<tr><td style="text-align:left">Constant</td><td>0.885<sup>***</sup></td><td>0.938<sup>***</sup></td><td>1.000<sup>***</sup></td><td>0.917<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(0.019)</td><td>(0.175)</td><td>(0.289)</td><td>(0.295)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
 <tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Covariate adjusted</td><td>No</td><td>Yes</td><td>No</td><td>Yes</td></tr>
 <tr><td style="text-align:left">Moderator</td><td>Male</td><td>Male</td><td>Ed.</td><td>Ed.</td></tr>
-<tr><td style="text-align:left">Observations</td><td>772</td><td>772</td><td>772</td><td>772</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.003</td><td>0.163</td><td>0.017</td><td>0.177</td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>-0.001</td><td>0.089</td><td>-0.0001</td><td>0.098</td></tr>
+<tr><td style="text-align:left">Observations</td><td>1,173</td><td>1,166</td><td>1,173</td><td>1,166</td></tr>
+<tr><td style="text-align:left">R<sup>2</sup></td><td>0.003</td><td>0.147</td><td>0.014</td><td>0.153</td></tr>
+<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.001</td><td>0.095</td><td>0.003</td><td>0.097</td></tr>
 <tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="4" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
 </table>
 

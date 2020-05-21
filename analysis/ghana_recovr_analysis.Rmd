@@ -1,7 +1,7 @@
 ---
-title: "Ghana RECOVR Experiment Analysis"
-author: "Molly Offer-Westort, Erika Kirgios"
-date: "5/19/2020"
+title: 'Ghana RECOVR Experiment Analysis'
+author: 'Molly Offer-Westort, Erika Kirgios'
+date: '5/19/2020'
 output: 
   html_document:
     keep_md: true
@@ -16,13 +16,13 @@ output:
 <style>
 
 table, td, th {
-  border: none;
-  padding-left: 1em;
-  padding-right: 1em;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 1em;
-  margin-bottom: 1em;
+border: none;
+padding-left: 1em;
+padding-right: 1em;
+margin-left: auto;
+margin-right: auto;
+margin-top: 1em;
+margin-bottom: 1em;
 }
 
 </style>
@@ -35,6 +35,11 @@ knitr::opts_chunk$set(
   warning = FALSE,
   message = FALSE
 )
+gg_color_hue <- function(n) {
+  hues = seq(15, 375, length = n + 1)
+  hcl(h = hues, l = 65, c = 100)[1:n]
+}
+
 ```
 
 ```{r load_packages, include = FALSE}
@@ -42,6 +47,7 @@ library(tidyverse) # data cleaning
 library(estimatr) # lin estimator
 library(stargazer) # tables
 library(sandwich) # Robust SEs
+theme_set(theme_bw())
 ```
 
 
@@ -50,10 +56,187 @@ The Ghana Core RECOVR project was launched [XXX] by Innovations for Poverty Acti
 
 The component of the study featured here is an experimental intervention included in the phone survey, with the objective of using nudges to increase information-seeking behavior. 
 
+*The script of the Ghana Core RECOVR survey is linked  [here](https://docs.google.com/spreadsheets/d/1uqAGQHUpbxKGCtAXBXmUp77TwE52Rk0PZgYN2J-WXuo/edit?usp=sharing).*
+
+# Survey overview
+
+** DATA LAST DOWNLOADED 5/21/20**
+
+## Demographics
+
+Selected questions. 
+
+**[[To add: income/poverty distribution]]**
+
+```{r overview, echo = FALSE}
+dat <- read_csv('../data/ghana_recovr.csv')
+
+# Region
+ggplot(dat, aes(x=factor(dem3, 
+                         levels = names(sort(table(dat$dem3), 
+                                             decreasing = TRUE))) )) + 
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  xlab('Region')
+
+# Age
+mean_age <- dat %>% 
+  group_by(dem2) %>% 
+  summarise(age = round(mean(dem1),2))
+
+ggplot(dat, aes(x=dem1, fill = dem2)) + 
+  geom_histogram(position = 'dodge', alpha=0.5, colour='grey50') + 
+  geom_vline(aes(xintercept = filter(mean_age, dem2 == 'Female')$age),
+             color=gg_color_hue(2)[1], linetype='dashed') +
+  geom_vline(aes(xintercept = filter(mean_age, dem2 == 'Male')$age),
+             color=gg_color_hue(2)[2], linetype='dashed') +
+  annotate(geom = 'text', 
+           x = filter(mean_age, dem2 == 'Female')$age+3, 
+           label = filter(mean_age, dem2 == 'Female')$age, y=40, 
+           color = gg_color_hue(2)[1]) +
+  annotate(geom = 'text', 
+           x = filter(mean_age, dem2 == 'Male')$age+3, 
+           label = filter(mean_age, dem2 == 'Male')$age, y=45, 
+           color = gg_color_hue(2)[2]) +
+  labs(fill = 'Sex') +
+  xlab('Age')
+
+# Education
+school_l <- c('None', 'Kindergarten', 'Primary', 'Middle/ Junior High',
+              'Secondary or Vocational', 'Post-Secondary', 'Refuses to Answer')
+ggplot(dat, aes(x=factor(dem11, 
+                         levels = school_l), fill = dem2)) + 
+  geom_bar(position = 'dodge', color = 'grey50', alpha = 0.5) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(fill = 'Sex') + 
+  xlab('Education')
+
+
+# Household size
+ggplot(dat, aes(x=dem9)) + 
+  geom_histogram() + 
+  geom_vline(aes(xintercept = round(mean(dat$dem9), 2)), 
+             linetype='dashed') +
+  annotate(geom = 'text', 
+           x = round(mean(dat$dem9), 2)+2, 
+           label = round(mean(dat$dem9), 2), y=170,) +
+  xlab('Household Size')
+
+```
+
+
+
+## COVID-19 
+Selected questions. 
+
+*In the past 7 days, how many days did members of your household go to a market or food store?*
+```{r covid3, echo=FALSE}
+ggplot(dat, aes(x=factor(cov3))) + 
+  geom_bar() + 
+  xlab('Days')
+```
+
+*In the past 7 days, have you washed your hands with soap and water more often, less often, or about the same as you did before mid-March (or before government closed schools)?*
+```{r covid4, echo=FALSE}
+ggplot(dat, aes(x=factor(cov4, levels = c('Less', 'Same', 'More') ))) + 
+  geom_bar() + 
+  xlab('Handwashing')
+```
+
+*In the last 7 days have you worn any type of face mask? If yes, what type?*
+```{r covid5, echo=FALSE}
+
+cov5 <- c(rep('Manufac. \n medical', sum(dat$cov5_1)),
+          rep('Homemade/\ncloth', sum(dat$cov5_2)),
+          rep('No', sum(dat$cov5_0)),
+          rep('Refuse to answer', sum(dat$cov5__888)))
+
+ggplot(data.frame(x = cov5), aes(x=x )) + 
+  geom_bar() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab('Worn Facemask')
+```
+
+*In the last 7 days, why have you not worn a facemask?*
+```{r covid6, echo=FALSE}
+
+cov6 <- c(rep('Not necessary', sum(dat$cov6_1, na.rm = TRUE)),
+          rep('Too expensive', sum(dat$cov6_2, na.rm = TRUE)),
+          rep('Not available locally', sum(dat$cov6_3, na.rm = TRUE)),
+          rep('Afraid to be stigmatized', sum(dat$cov6_4, na.rm = TRUE)),
+          rep('N/A \n (Did not go out)', sum(dat$cov6__111, na.rm = TRUE)),
+          rep('Other', sum(dat$cov6__666, na.rm = TRUE)),
+          rep("Don't know", sum(dat$cov6__888, na.rm = TRUE)),
+          rep('Refuses to Answer', sum(dat$cov6__999, na.rm = TRUE)))
+
+ggplot(data.frame(x = factor(cov6, levels = unique(cov6))), aes(x=x )) + 
+  geom_bar() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab('Why no mask')
+```
+
+*Do you feel that you or anyone in your household is at risk of contracting covid-19?*
+```{r covid7, echo=FALSE}
+
+ggplot(dat, aes(x=factor(cov7, levels = c('Yes', 'No', "Don't know", 'Refuses to Answer')))) + 
+  geom_bar() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab('At risk for COVID-19')
+```
+
+*If NO to COV7...Why do you feel that your household is not at risk of contracting covid-19?*
+```{r covid8, echo=FALSE}
+
+cov8 <- c(rep('Belief in God', sum(dat$cov8_1, na.rm = TRUE)),
+          rep('Follow preventive measures', sum(dat$cov8_2, na.rm = TRUE)),
+          rep('Does not exist where I live', sum(dat$cov8_3, na.rm = TRUE)),
+          rep('Does not exist at all', sum(dat$cov8_4, na.rm = TRUE)),
+          rep('We are strong and healthy', sum(dat$cov8_5, na.rm = TRUE)),
+          rep('Hot weather', sum(dat$cov8_6, na.rm = TRUE)),
+          rep('Racial/ethnic group not affected', sum(dat$cov8_7, na.rm = TRUE)),
+          rep('Other', sum(dat$cov8__666, na.rm = TRUE)),
+          rep("Don't know", sum(dat$cov8__888, na.rm = TRUE)),
+          rep('Refuses to Answer', sum(dat$cov8__999, na.rm = TRUE)))
+
+
+ggplot(data.frame(x = factor(cov8, levels = unique(cov8))), aes(x=x )) + 
+  geom_bar() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab('Why no risk')
+```
+
+*Do you think the reaction of your country’s government to the current coronavirus outbreak is appropriate, too extreme, or not sufficient?*
+```{r covid9, echo=FALSE}
+
+ggplot(dat, aes(x=factor(cov9, levels = c('Not sufficient', 
+                                          'Somewhat insufficient', 
+                                          'Appropriate',
+                                          'Somewhat too extreme',
+                                          'Much too extreme',
+                                          'Refuses to Answer') ))) + 
+  geom_bar() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab('Reaction sentiment')
+```
+
+*What is your main source of concern related to the effects of the Coronavirus crisis on Ghanaians?*
+```{r covid10, echo=FALSE}
+
+ggplot(dat, aes(x=factor(cov10, levels = c('Health', 
+                                          'Lack of Money', 
+                                          'Not concerned',
+                                          "Don't know",
+                                          'Refuses to Answer') ))) + 
+  geom_bar() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab('Concerns')
+```
+
+# Experiment
 
 Treated participants were asked to *name and reflect on someone at high risk of dying from coronavirus who they care about*. Control participants were not asked these questions. Treatment was assigned to randomly sorted telephone numbers prior to the intervention. 
 
-*The script of the Ghana Core RECOVR survey is linked  [here](https://docs.google.com/spreadsheets/d/1uqAGQHUpbxKGCtAXBXmUp77TwE52Rk0PZgYN2J-WXuo/edit?usp=sharing).*
+
 
 
 ### Primary hypothesis
@@ -64,14 +247,12 @@ The primary hypothesis is that treated subjects will be more likely to
 (2) seek more information about coronavirus. 
 
 
-
-
 ## Data
 
 ### Treatment and dependent variable  
 
-```{r load_data}
-dat <- read_csv('../data/ghana_recovr.csv')
+```{r code_treat}
+
 dat$treat <- 1*(dat$rand1 == 'Identifiable victim')
 
 # some people did not recieve treatment assignment
@@ -111,7 +292,7 @@ table(dat$exp2, dat$exp3, useNA = 'ifany')
 table(dat$exp2, dat$exp4, useNA = 'ifany')
 
 # *Treatment delivery
-# (EXP5) "*If YES to exp4* Can you tell me about them?"
+# (EXP5) '*If YES to exp4* Can you tell me about them?'
 # - confirm only responses for those individuals that responeded 'no' to exp4 
 table(dat$exp2, dat$exp5, useNA = 'ifany')
 
@@ -191,7 +372,7 @@ dat$reg <- dat$region <- factor(dat$dem3) # creates factor for region
 dat <- dat %>% # creates region dummies
   mutate(dummy = 1) %>% 
   spread(key = reg,
-         sep = "_",
+         sep = '_',
          value = dummy,
          fill = 0
   ) %>% # mean-centered variables for regions
@@ -203,7 +384,7 @@ dat$ed <- dat$education <- factor(dat$dem11) # creates factor for education
 dat <- dat %>%
   mutate(dummy = 1) %>% 
   spread(key = ed,
-         sep = "_",
+         sep = '_',
          value = dummy,
          fill = 0
   ) %>%
@@ -212,8 +393,9 @@ dat <- dat %>%
 
 # indicator for whether the participant’s household is below poverty level
 dat$pov_level <- 1*(dat$pov1 == 'a') # !!!CONFIRM!!!
-dat$pov_level_flag <- 1*(dat$pov1 == -888 | dat$pov1 == -999)
-dat$pov_level_c <- dat$pov_level - mean(dat$pov_level)
+dat$pov_level[which(is.na(dat$pov1))] <- 0
+dat$pov_level_flag <- 1*(dat$pov1 == -888 | dat$pov1 == -999 | is.na(dat$pov1))
+dat$pov_level_c <- dat$pov_level - mean(dat$pov_level, na.rm = TRUE)
 dat$pov_level_flag_c <- dat$pov_level_flag - mean(dat$pov_level_flag)
 
 # indicator for the phone surveyor who administered the survey
@@ -221,7 +403,7 @@ dat$sv <- dat$surveyor <- factor(dat$survyeorid)
 dat <- dat %>%
   mutate(dummy = 1) %>% 
   spread(key = sv,
-         sep = "_",
+         sep = '_',
          value = dummy,
          fill = 0
   ) %>%
@@ -232,7 +414,7 @@ dat$cv <- dat$consent_version <- factor(dat$cons_rand_vers)
 dat <- dat %>% 
   mutate(dummy = 1) %>% 
   spread(key = cv,
-         sep = "_",
+         sep = '_',
          value = dummy,
          fill = 0
   ) %>% 
@@ -243,7 +425,7 @@ dat$dt <- dat$int_date <- factor(dat$date)
 dat <- dat %>% 
   mutate(dummy = 1) %>% 
   spread(key = dt,
-         sep = "_",
+         sep = '_',
          value = dummy,
          fill = 0
   ) %>% 
@@ -296,9 +478,9 @@ glm2i_log <- glm(Y_info ~ treat +
 
 # Stated behavioral outcomes
 
-# OLS
+# Difference in means
 lm1b_ols <- lm(Y_behav ~ treat, data = dat)
-
+# OLS adjusted
 lm2b_ols <- lm(Y_behav ~ treat +
                  male + male_flag + age + age_flag + region + education + 
                  pov_level + pov_level_flag + surveyor + consent_version +
@@ -326,26 +508,26 @@ glm2b_log <- glm(Y_behav ~ treat +
 # Just to confirm, if we were to do the Lin estimator by hand;
 # although this will need to be updated with variable names for dates, etc.
 ffi <- paste0(c('Y_info ~ treat*(', 
-               paste0(c('male_c', 'male_flag',
-                        'age_c', 'age_flag', 
-                        paste0('`reg_', levels(dat$region)[-1], '_c`'),
-                        paste0('`ed_', levels(dat$education)[-1], '_c`'),
-                        'pov_level_c', 'pov_level_flag_c', 
-                        paste0('`sv_', levels(dat$surveyor)[-1], '_c`'),
-                        paste0('`cv_', levels(dat$consent_version)[-1], '_c`'),
-                        paste0('`dt_', levels(dat$int_date)[-1], '_c`')), 
-                      collapse = ' + '), ')'), collapse = '')
+                paste0(c('male_c', 'male_flag',
+                         'age_c', 'age_flag', 
+                         paste0('`reg_', levels(dat$region)[-1], '_c`'),
+                         paste0('`ed_', levels(dat$education)[-1], '_c`'),
+                         'pov_level_c', 'pov_level_flag_c', 
+                         paste0('`sv_', levels(dat$surveyor)[-1], '_c`'),
+                         paste0('`cv_', levels(dat$consent_version)[-1], '_c`'),
+                         paste0('`dt_', levels(dat$int_date)[-1], '_c`')), 
+                       collapse = ' + '), ')'), collapse = '')
 
 ffb <- paste0(c('Y_behav ~ treat*(', 
-               paste0(c('male_c', 'male_flag',
-                        'age_c', 'age_flag', 
-                        paste0('`reg_', levels(dat$region)[-1], '_c`'),
-                        paste0('`ed_', levels(dat$education)[-1], '_c`'),
-                        'pov_level_c', 'pov_level_flag_c', 
-                        paste0('`sv_', levels(dat$surveyor)[-1], '_c`'),
-                        paste0('`cv_', levels(dat$consent_version)[-1], '_c`'),
-                        paste0('`dt_', levels(dat$int_date)[-1], '_c`')), 
-                      collapse = ' + '), ')'), collapse = '')
+                paste0(c('male_c', 'male_flag',
+                         'age_c', 'age_flag', 
+                         paste0('`reg_', levels(dat$region)[-1], '_c`'),
+                         paste0('`ed_', levels(dat$education)[-1], '_c`'),
+                         'pov_level_c', 'pov_level_flag_c', 
+                         paste0('`sv_', levels(dat$surveyor)[-1], '_c`'),
+                         paste0('`cv_', levels(dat$consent_version)[-1], '_c`'),
+                         paste0('`dt_', levels(dat$int_date)[-1], '_c`')), 
+                       collapse = ' + '), ')'), collapse = '')
 
 lm4i_lin <- lm(ffi, data = dat)
 
@@ -357,8 +539,8 @@ lm4b_lin <- lm(ffb, data = dat)
 stargazer(lm1i_ols, lm2i_ols, lm4i_lin, glm1i_log, glm2i_log, type = 'html',
           # Standard errors are HC2
           se = list(sqrt(diag(vcov(lm1i_ols, type = 'HC2'))),
-              sqrt(diag(vcov(lm2i_ols, type = 'HC2'))),
-              sqrt(diag(vcov(lm4i_lin, type = 'HC2')))),
+                    sqrt(diag(vcov(lm2i_ols, type = 'HC2'))),
+                    sqrt(diag(vcov(lm4i_lin, type = 'HC2')))),
           add.lines = 
             list(c('Covariate adjusted', 'No', 'Yes','Yes (Lin)', 'No', 'Yes')), 
           keep = c('^Constant$', '^treat$'),
@@ -369,8 +551,8 @@ stargazer(lm1i_ols, lm2i_ols, lm4i_lin, glm1i_log, glm2i_log, type = 'html',
 
 stargazer(lm1b_ols, lm2b_ols, lm4b_lin, glm1b_log, glm2b_log, type = 'html', 
           se = list(sqrt(diag(vcov(lm1b_ols, type = 'HC2'))),
-              sqrt(diag(vcov(lm2b_ols, type = 'HC2'))),
-              sqrt(diag(vcov(lm4b_lin, type = 'HC2')))),
+                    sqrt(diag(vcov(lm2b_ols, type = 'HC2'))),
+                    sqrt(diag(vcov(lm4b_lin, type = 'HC2')))),
           add.lines = 
             list(c('Covariate adjusted', 'No', 'Yes','Yes (Lin)', 'No', 'Yes')), 
           keep = c('^Constant$', '^treat$'),
@@ -388,32 +570,32 @@ As exploratory analyses, we will test the following potential moderators for the
 ```{r secondary_analysis}
 lm1i_ols_g <- lm(Y_info ~ treat*male, data = dat)
 lm2i_ols_g <- lm(Y_info ~ treat*male 
-               + male_flag + age + age_flag + region + education + 
-                 pov_level + pov_level_flag + surveyor + consent_version +
-                 int_date, 
-               data = dat)
+                 + male_flag + age + age_flag + region + education + 
+                   pov_level + pov_level_flag + surveyor + consent_version +
+                   int_date, 
+                 data = dat)
 
 lm1i_ols_e <- lm(Y_info ~ treat*education, data = dat)
 lm2i_ols_e <- lm(Y_info ~ treat*education +
-                 male + male_flag + age + age_flag + region +
-                 pov_level + pov_level_flag + surveyor + consent_version +
-                 int_date, 
-               data = dat)
+                   male + male_flag + age + age_flag + region +
+                   pov_level + pov_level_flag + surveyor + consent_version +
+                   int_date, 
+                 data = dat)
 
 
 lm1b_ols_g <- lm(Y_info ~ treat*male, data = dat)
 lm2b_ols_g <- lm(Y_info ~ treat*male 
-               + male_flag + age + age_flag + region + education + 
-                 pov_level + pov_level_flag + surveyor + consent_version +
-                 int_date, 
-               data = dat)
+                 + male_flag + age + age_flag + region + education + 
+                   pov_level + pov_level_flag + surveyor + consent_version +
+                   int_date, 
+                 data = dat)
 
 lm1b_ols_e <- lm(Y_info ~ treat*education, data = dat)
 lm2b_ols_e <- lm(Y_info ~ treat*education +
-                 male + male_flag + age + age_flag + region +
-                 pov_level + pov_level_flag + surveyor + consent_version +
-                 int_date, 
-               data = dat)
+                   male + male_flag + age + age_flag + region +
+                   pov_level + pov_level_flag + surveyor + consent_version +
+                   int_date, 
+                 data = dat)
 
 
 ```
@@ -425,9 +607,9 @@ stargazer(lm1i_ols_g, lm2i_ols_g, lm1i_ols_e, lm2i_ols_e,
           type = 'html',
           # Standard errors are HC2
           se = list(sqrt(diag(vcov(lm1i_ols_g, type = 'HC2'))),
-              sqrt(diag(vcov(lm2i_ols_g, type = 'HC2'))),
-              sqrt(diag(vcov(lm1i_ols_e, type = 'HC2'))),
-              sqrt(diag(vcov(lm2i_ols_e, type = 'HC2')))),
+                    sqrt(diag(vcov(lm2i_ols_g, type = 'HC2'))),
+                    sqrt(diag(vcov(lm1i_ols_e, type = 'HC2'))),
+                    sqrt(diag(vcov(lm2i_ols_e, type = 'HC2')))),
           add.lines = 
             list(c('Covariate adjusted', 'No', 'Yes', 'No', 'Yes'),
                  c('Moderator', 'Male', 'Male', 'Ed.', 'Ed.')), 
@@ -440,9 +622,9 @@ stargazer(lm1b_ols_g, lm2b_ols_g, lm1b_ols_e, lm2b_ols_e,
           type = 'html',
           # Standard errors are HC2
           se = list(sqrt(diag(vcov(lm1b_ols_g, type = 'HC2'))),
-              sqrt(diag(vcov(lm2b_ols_g, type = 'HC2'))),
-              sqrt(diag(vcov(lm1b_ols_e, type = 'HC2'))),
-              sqrt(diag(vcov(lm2b_ols_e, type = 'HC2')))),
+                    sqrt(diag(vcov(lm2b_ols_g, type = 'HC2'))),
+                    sqrt(diag(vcov(lm1b_ols_e, type = 'HC2'))),
+                    sqrt(diag(vcov(lm2b_ols_e, type = 'HC2')))),
           add.lines = 
             list(c('Covariate adjusted', 'No', 'Yes', 'No', 'Yes'),
                  c('Moderator', 'Male', 'Male', 'Ed.', 'Ed.')), 

@@ -19,7 +19,7 @@ Output	 : data:
 use "Ghana Core RECOVR Survey.dta", clear
 
 // save as .csv
-outsheet  using ghana_recovr.csv , comma 
+outsheet  using ghana_recovr.csv , comma replace
 
 // save variable name, type, isnumeric, format, labels in .csv file
 preserve
