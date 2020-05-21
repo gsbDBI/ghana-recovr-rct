@@ -1574,13 +1574,27 @@ div.tocify {
 </div>
 
 
+<style>
+
+table, td, th {
+  border: none;
+  padding-left: 1em;
+  padding-right: 1em;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+</style>
 <div id="overivew" class="section level2">
 <h2>Overivew</h2>
 <p>The Ghana Core RECOVR project was launched [XXX] by Innovations for Poverty Action, as a nationally representative phone survey delivered to approximately 4,000 respondents. The objective of the study is to [XXX].</p>
 <p>The component of the study featured here is an experimental intervention included in the phone survey, with the objective of using nudges to increase information-seeking behavior.</p>
 <p>Treated participants were asked to <em>name and reflect on someone at high risk of dying from coronavirus who they care about</em>. Control participants were not asked these questions. Treatment was assigned to randomly sorted telephone numbers prior to the intervention.</p>
-<div id="primary-hypothesis." class="section level3">
-<h3>Primary hypothesis.</h3>
+<p><em>The script of the Ghana Core RECOVR survey is linked <a href="https://docs.google.com/spreadsheets/d/1uqAGQHUpbxKGCtAXBXmUp77TwE52Rk0PZgYN2J-WXuo/edit?usp=sharing">here</a>.</em></p>
+<div id="primary-hypothesis" class="section level3">
+<h3>Primary hypothesis</h3>
 <p>The primary hypothesis is that treated subjects will be more likely to</p>
 <ol style="list-style-type: decimal">
 <li>indicate willingness to comply with recommendations for reducing the spread of coronavirus like social distancing, hand washing, etc. and</li>
@@ -1593,74 +1607,63 @@ div.tocify {
 <div id="treatment-and-dependent-variable" class="section level3">
 <h3>Treatment and dependent variable</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">'../data/ghana_recovr.csv'</span>)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">dat<span class="op">$</span>treat &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">*</span>(dat<span class="op">$</span>rand1 <span class="op">==</span><span class="st"> 'Identifiable victim'</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-2" data-line-number="2">dat<span class="op">$</span>treat &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">*</span>(dat<span class="op">$</span>rand1 <span class="op">==</span><span class="st"> 'Identifiable victim'</span>)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co"># some people did not recieve treatment assignment</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="kw">table</span>(dat<span class="op">$</span>treat, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
+<pre><code>## 
+##    0    1 &lt;NA&gt; 
+##  402  370   28</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># keep only if consented &amp; received treatment assignment</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">dat &lt;-<span class="st"> </span>dat <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="st">  </span><span class="kw">filter</span>(consent_survey <span class="op">==</span><span class="st"> 'Yes'</span>,</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">         <span class="op">!</span><span class="kw">is.na</span>(treat))</a></code></pre></div>
 <p>We have two key dependent variables: (1) behavior change intentions and (2) information seeking.</p>
-<p><em>Behavior change intentions:</em> Participants are asked “Would you be willing to cancel social activities, avoid going to the markets and crowded places as much as possible, and wash your hands often with soap and water if possible to protect yourself, your loved ones, and other Ghanaians?” The dependent variable is a binary indicator for whether a participant responded with “Yes”. “No” and refusal to respond will both be coded as 0.</p>
-<p><em>Information seeking:</em> We will offer participants the opportunity to learn about a free service they can use to get more information about coronavirus. Specifically, we will tell them “The best way to protect yourself, your loved ones, and other Ghanaians is to stay informed about COVID-19 and how to prevent its spread. Would you like me to provide you with a phone number you can call to get free and accurate information about coronavirus and learn how you can keep yourself, your loved ones, and other Ghanaians safe?” The dependent variable is a binary indicator for whether participants said “Yes” to this offer. Participants who refuse to reply will be coded as 0 along with those who say “no”.</p>
-<p><em>Confirm survey flow, experiment was conducted as expected:</em></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># (EXP2) Is there anyone you care about who is at high risk of dying from</span></a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co"># coronavirus?</span></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw">table</span>(dat<span class="op">$</span>treat, dat<span class="op">$</span>exp2, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
-<pre><code>##       
-##         No Yes &lt;NA&gt;
-##   0      0   0  402
-##   1    294  76    0
-##   &lt;NA&gt;   0   0   28</code></pre>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># (EXP3) *If YES to exp2* Can you tell me about them?</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">table</span>(dat<span class="op">$</span>treat, dat<span class="op">$</span>exp3, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
-<pre><code>##       
-##        Yes, respondent thinks of or identifies an individual &lt;NA&gt;
-##   0                                                        0  402
-##   1                                                       76  294
-##   &lt;NA&gt;                                                     0   28</code></pre>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp3, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
+<p><strong>Behavior change intentions:</strong> Participants are asked “Would you be willing to cancel social activities, avoid going to the markets and crowded places as much as possible, and wash your hands often with soap and water if possible to protect yourself, your loved ones, and other Ghanaians?” The dependent variable is a binary indicator for whether a participant responded with “Yes”. “No” and refusal to respond will both be coded as 0.</p>
+<p><strong>Information seeking:</strong> We will offer participants the opportunity to learn about a free service they can use to get more information about coronavirus. Specifically, we will tell them “The best way to protect yourself, your loved ones, and other Ghanaians is to stay informed about COVID-19 and how to prevent its spread. Would you like me to provide you with a phone number you can call to get free and accurate information about coronavirus and learn how you can keep yourself, your loved ones, and other Ghanaians safe?” The dependent variable is a binary indicator for whether participants said “Yes” to this offer. Participants who refuse to reply will be coded as 0 along with those who say “no”.</p>
+<p><strong>Confirm experiment was delivered as expected:</strong></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># *Treatment delivery</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co"># (EXP2) Is there anyone you care about who is at high risk of dying from</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co"># coronavirus?</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co"># - confirm only responses for treated individuals</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="kw">table</span>(dat<span class="op">$</span>treat, dat<span class="op">$</span>exp2, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
+<pre><code>##    
+##      No Yes &lt;NA&gt;
+##   0   0   0  402
+##   1 294  76    0</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co"># (EXP3) *If YES to exp2* Can you tell me about them?</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co"># - confirm only responses for those individuals that responded 'yes' to exp2</span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp3, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
 <pre><code>##       
 ##        Yes, respondent thinks of or identifies an individual &lt;NA&gt;
 ##   No                                                       0  294
 ##   Yes                                                     76    0
-##   &lt;NA&gt;                                                     0  430</code></pre>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co"># (EXP4) *If NO to exp2* Is there anyone in your neighborhood, family or broader </span></a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co"># community who is over sixty-five or has any health problems that could put </span></a>
-<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co"># them at higher risk?</span></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="kw">table</span>(dat<span class="op">$</span>treat, dat<span class="op">$</span>exp4, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
-<pre><code>##       
-##         No Refuses to Answer Yes &lt;NA&gt;
-##   0      0                 0   0  402
-##   1    261                 2  31   76
-##   &lt;NA&gt;   0                 0   0   28</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp4, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
+##   &lt;NA&gt;                                                     0  402</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co"># *Treatment delivery</span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co"># (EXP4) *If NO to exp2* Is there anyone in your neighborhood, family or broader </span></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co"># community who is over sixty-five or has any health problems that could put </span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co"># them at higher risk?</span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co"># - confirm only responses for those individuals that responeded 'no' to exp2 </span></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp4, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
 <pre><code>##       
 ##         No Refuses to Answer Yes &lt;NA&gt;
 ##   No   261                 2  31    0
 ##   Yes    0                 0   0   76
-##   &lt;NA&gt;   0                 0   0  430</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="co"># (EXP5) &quot;*If YES to exp4* Can you tell me about them?&quot;</span></a>
-<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="kw">table</span>(dat<span class="op">$</span>treat, dat<span class="op">$</span>exp5, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
-<pre><code>##       
-##        Yes, respondent thinks of or identifies an individual &lt;NA&gt;
-##   0                                                        0  402
-##   1                                                       31  339
-##   &lt;NA&gt;                                                     0   28</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp5, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
+##   &lt;NA&gt;   0                 0   0  402</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co"># *Treatment delivery</span></a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co"># (EXP5) &quot;*If YES to exp4* Can you tell me about them?&quot;</span></a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co"># - confirm only responses for those individuals that responeded 'no' to exp4 </span></a>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp5, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
 <pre><code>##       
 ##        Yes, respondent thinks of or identifies an individual &lt;NA&gt;
 ##   No                                                      31  263
 ##   Yes                                                      0   76
-##   &lt;NA&gt;                                                     0  430</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="co"># (EXP6) *If YES to exp2 or exp4* Can you tell me a bit about why they are </span></a>
-<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="co"># important to you?</span></a>
-<a class="sourceLine" id="cb16-3" data-line-number="3"><span class="kw">table</span>(dat<span class="op">$</span>treat, dat<span class="op">$</span>exp6, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
-<pre><code>##       
-##        Refused, respondent didn't say anything
-##   0                                          0
-##   1                                          7
-##   &lt;NA&gt;                                       0
-##       
-##        Yes, respondent thinks of or identifies an individual &lt;NA&gt;
-##   0                                                        0  402
-##   1                                                      100  263
-##   &lt;NA&gt;                                                     0   28</code></pre>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp6, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
+##   &lt;NA&gt;                                                     0  402</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="co"># *Treatment delivery</span></a>
+<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="co"># (EXP6) *If YES to exp2 or exp4* Can you tell me a bit about why they are </span></a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co"># important to you?</span></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co"># - confirm only responses for those individuals that responeded 'yes' to exp2/4 </span></a>
+<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp6, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
 <pre><code>##       
 ##        Refused, respondent didn't say anything
 ##   No                                         3
@@ -1670,8 +1673,8 @@ div.tocify {
 ##        Yes, respondent thinks of or identifies an individual &lt;NA&gt;
 ##   No                                                      28  263
 ##   Yes                                                     72    0
-##   &lt;NA&gt;                                                     0  430</code></pre>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp4, dat<span class="op">$</span>exp6, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
+##   &lt;NA&gt;                                                     0  402</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp4, dat<span class="op">$</span>exp6, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
 <pre><code>##                    
 ##                     Refused, respondent didn't say anything
 ##   No                                                      0
@@ -1689,114 +1692,2065 @@ div.tocify {
 ##   No                 261
 ##   Refuses to Answer    2
 ##   Yes                  0
-##   &lt;NA&gt;               430</code></pre>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="co"># (EXP7) *If YES to exp2 or exp4*  Would you be upset if something happened to </span></a>
-<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="co"># them?</span></a>
-<a class="sourceLine" id="cb22-3" data-line-number="3"><span class="kw">table</span>(dat<span class="op">$</span>treat, dat<span class="op">$</span>exp7, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
-<pre><code>##       
-##         No Yes &lt;NA&gt;
-##   0      0   0  402
-##   1      5 102  263
-##   &lt;NA&gt;   0   0   28</code></pre>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp7, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
+##   &lt;NA&gt;               402</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="co"># *Treatment delivery</span></a>
+<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="co"># (EXP7) *If YES to exp2 or exp4*  Would you be upset if something happened to </span></a>
+<a class="sourceLine" id="cb16-3" data-line-number="3"><span class="co"># them?</span></a>
+<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="co"># - confirm only responses for those individuals that responeded 'yes' to exp2/4 </span></a>
+<a class="sourceLine" id="cb16-5" data-line-number="5"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp7, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
 <pre><code>##       
 ##         No Yes &lt;NA&gt;
 ##   No     1  30  263
 ##   Yes    4  72    0
-##   &lt;NA&gt;   0   0  430</code></pre>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp4, dat<span class="op">$</span>exp7, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
+##   &lt;NA&gt;   0   0  402</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp4, dat<span class="op">$</span>exp7, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
 <pre><code>##                    
 ##                      No Yes &lt;NA&gt;
 ##   No                  0   0  261
 ##   Refuses to Answer   0   0    2
 ##   Yes                 1  30    0
-##   &lt;NA&gt;                4  72  430</code></pre>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="co"># (EXP8) *If YES to exp2 or exp4* I really appreciate you sharing that. Would </span></a>
-<a class="sourceLine" id="cb28-2" data-line-number="2"><span class="co"># you be willing to cancel social activities, avoid going to the markets and </span></a>
-<a class="sourceLine" id="cb28-3" data-line-number="3"><span class="co"># crowded places as much as possible, and wash your hands often with soap and </span></a>
-<a class="sourceLine" id="cb28-4" data-line-number="4"><span class="co"># water if possible to protect yourself, your loved ones, and other Ghanaians?</span></a>
-<a class="sourceLine" id="cb28-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb28-6" data-line-number="6"><span class="kw">table</span>(dat<span class="op">$</span>treat, dat<span class="op">$</span>exp8, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
-<pre><code>##       
-##         No Yes &lt;NA&gt;
-##   0      0   0  402
-##   1      4 103  263
-##   &lt;NA&gt;   0   0   28</code></pre>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp8, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
+##   &lt;NA&gt;                4  72  402</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="co"># *Behavioral outcome, treated who received treatment</span></a>
+<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="co"># (EXP8) *If YES to exp2 or exp4* I really appreciate you sharing that. Would </span></a>
+<a class="sourceLine" id="cb20-3" data-line-number="3"><span class="co"># you be willing to cancel social activities, avoid going to the markets and </span></a>
+<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="co"># crowded places as much as possible, and wash your hands often with soap and </span></a>
+<a class="sourceLine" id="cb20-5" data-line-number="5"><span class="co"># water if possible to protect yourself, your loved ones, and other Ghanaians?</span></a>
+<a class="sourceLine" id="cb20-6" data-line-number="6"><span class="co"># - confirm only responses for those individuals that responeded 'yes' to exp2/4 </span></a>
+<a class="sourceLine" id="cb20-7" data-line-number="7"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp8, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
 <pre><code>##       
 ##         No Yes &lt;NA&gt;
 ##   No     1  30  263
 ##   Yes    3  73    0
-##   &lt;NA&gt;   0   0  430</code></pre>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp4, dat<span class="op">$</span>exp8, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
+##   &lt;NA&gt;   0   0  402</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp4, dat<span class="op">$</span>exp8, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
 <pre><code>##                    
 ##                      No Yes &lt;NA&gt;
 ##   No                  0   0  261
 ##   Refuses to Answer   0   0    2
 ##   Yes                 1  30    0
-##   &lt;NA&gt;                3  73  430</code></pre>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1"><span class="co"># (EXP9) *If CONTROL or no to exp2 and exp4* Would you be willing to cancel </span></a>
-<a class="sourceLine" id="cb34-2" data-line-number="2"><span class="co"># social activities, avoid going to the markets and crowded places as much as</span></a>
-<a class="sourceLine" id="cb34-3" data-line-number="3"><span class="co"># possible, and wash your hands often with soap and water if possible to protect</span></a>
-<a class="sourceLine" id="cb34-4" data-line-number="4"><span class="co"># yourself, your loved ones, and other Ghanaians?</span></a>
-<a class="sourceLine" id="cb34-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb34-6" data-line-number="6"><span class="kw">table</span>(dat<span class="op">$</span>treat, dat<span class="op">$</span>exp9, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
-<pre><code>##       
-##        Don't know  No Yes &lt;NA&gt;
-##   0             1  24 377    0
-##   1             1  14 248  107
-##   &lt;NA&gt;          0   1  27    0</code></pre>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp9, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
+##   &lt;NA&gt;                3  73  402</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="co"># *Behavioral outcome, control + treated who did not recieve treatment</span></a>
+<a class="sourceLine" id="cb24-2" data-line-number="2"><span class="co"># (EXP9) *If CONTROL or no to exp2 and exp4* Would you be willing to cancel </span></a>
+<a class="sourceLine" id="cb24-3" data-line-number="3"><span class="co"># social activities, avoid going to the markets and crowded places as much as</span></a>
+<a class="sourceLine" id="cb24-4" data-line-number="4"><span class="co"># possible, and wash your hands often with soap and water if possible to protect</span></a>
+<a class="sourceLine" id="cb24-5" data-line-number="5"><span class="co"># yourself, your loved ones, and other Ghanaians?</span></a>
+<a class="sourceLine" id="cb24-6" data-line-number="6"><span class="co"># - confirm only responses for those individuals that responeded 'no' to exp2/4 </span></a>
+<a class="sourceLine" id="cb24-7" data-line-number="7"><span class="co"># or control</span></a>
+<a class="sourceLine" id="cb24-8" data-line-number="8"><span class="kw">table</span>(dat<span class="op">$</span>treat, dat<span class="op">$</span>exp9, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
+<pre><code>##    
+##     Don't know  No Yes &lt;NA&gt;
+##   0          1  24 377    0
+##   1          1  14 248  107</code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp2, dat<span class="op">$</span>exp9, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
 <pre><code>##       
 ##        Don't know  No Yes &lt;NA&gt;
 ##   No            1  14 248   31
 ##   Yes           0   0   0   76
-##   &lt;NA&gt;          1  25 404    0</code></pre>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp4, dat<span class="op">$</span>exp9, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
+##   &lt;NA&gt;          1  24 377    0</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="kw">table</span>(dat<span class="op">$</span>exp4, dat<span class="op">$</span>exp9, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
 <pre><code>##                    
 ##                     Don't know  No Yes &lt;NA&gt;
 ##   No                         1  14 246    0
 ##   Refuses to Answer          0   0   2    0
 ##   Yes                        0   0   0   31
-##   &lt;NA&gt;                       1  25 404   76</code></pre>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="co"># (EXP10) The best way to protect yourself, your loved ones, and other Ghanaians </span></a>
-<a class="sourceLine" id="cb40-2" data-line-number="2"><span class="co"># is to stay informed about COVID-19 and how to prevent its spread. Would you </span></a>
-<a class="sourceLine" id="cb40-3" data-line-number="3"><span class="co"># like me to provide you with a phone number you can call to get free and </span></a>
-<a class="sourceLine" id="cb40-4" data-line-number="4"><span class="co"># accurate information about coronavirus and learn how you can keep yourself, </span></a>
-<a class="sourceLine" id="cb40-5" data-line-number="5"><span class="co"># your loved ones, and other Ghanaians safe? </span></a>
-<a class="sourceLine" id="cb40-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb40-7" data-line-number="7"><span class="kw">table</span>(dat<span class="op">$</span>treat, dat<span class="op">$</span>exp10, <span class="dt">useNA =</span> <span class="st">'always'</span>)</a></code></pre></div>
-<pre><code>##       
-##         No Yes &lt;NA&gt;
-##   0     36 366    0
-##   1     35 335    0
-##   &lt;NA&gt;   0  28    0</code></pre>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="co"># Code outcome variables</span></a>
-<a class="sourceLine" id="cb42-2" data-line-number="2">dat<span class="op">$</span>Y_behav &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">*</span>(<span class="kw">coalesce</span>(dat<span class="op">$</span>exp8, dat<span class="op">$</span>exp9)<span class="op">==</span><span class="st">'Yes'</span>)</a>
-<a class="sourceLine" id="cb42-3" data-line-number="3"><span class="kw">table</span>(dat<span class="op">$</span>Y_behav)</a></code></pre></div>
-<pre><code>## 
-##   0   1 
-##  45 755</code></pre>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1">dat<span class="op">$</span>Y_info &lt;-<span class="st"> </span>dat<span class="op">$</span>exp10</a>
-<a class="sourceLine" id="cb44-2" data-line-number="2"><span class="kw">table</span>(dat<span class="op">$</span>Y_info)</a></code></pre></div>
+##   &lt;NA&gt;                       1  24 377   76</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="co"># *Information-seeking outcome, all</span></a>
+<a class="sourceLine" id="cb30-2" data-line-number="2"><span class="co"># (EXP10) The best way to protect yourself, your loved ones, and other Ghanaians </span></a>
+<a class="sourceLine" id="cb30-3" data-line-number="3"><span class="co"># is to stay informed about COVID-19 and how to prevent its spread. Would you </span></a>
+<a class="sourceLine" id="cb30-4" data-line-number="4"><span class="co"># like me to provide you with a phone number you can call to get free and </span></a>
+<a class="sourceLine" id="cb30-5" data-line-number="5"><span class="co"># accurate information about coronavirus and learn how you can keep yourself, </span></a>
+<a class="sourceLine" id="cb30-6" data-line-number="6"><span class="co"># your loved ones, and other Ghanaians safe? </span></a>
+<a class="sourceLine" id="cb30-7" data-line-number="7"><span class="kw">table</span>(dat<span class="op">$</span>exp10, <span class="dt">useNA =</span> <span class="st">'ifany'</span>)</a></code></pre></div>
 <pre><code>## 
 ##  No Yes 
-##  71 729</code></pre>
+##  71 701</code></pre>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="co"># Code outcome variables</span></a>
+<a class="sourceLine" id="cb32-2" data-line-number="2">dat<span class="op">$</span>Y_behav &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">*</span>(<span class="kw">coalesce</span>(dat<span class="op">$</span>exp8, dat<span class="op">$</span>exp9)<span class="op">==</span><span class="st">'Yes'</span>)</a>
+<a class="sourceLine" id="cb32-3" data-line-number="3"><span class="kw">table</span>(dat<span class="op">$</span>treat, dat<span class="op">$</span>Y_behav)</a></code></pre></div>
+<pre><code>##    
+##       0   1
+##   0  25 377
+##   1  19 351</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1">dat<span class="op">$</span>Y_info &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">*</span>(dat<span class="op">$</span>exp10<span class="op">==</span><span class="st">'Yes'</span>)</a>
+<a class="sourceLine" id="cb34-2" data-line-number="2"><span class="kw">table</span>(dat<span class="op">$</span>treat, dat<span class="op">$</span>Y_info)</a></code></pre></div>
+<pre><code>##    
+##       0   1
+##   0  36 366
+##   1  35 335</code></pre>
 </div>
 <div id="cleaning" class="section level3">
 <h3>Cleaning</h3>
 <p>We will include the following control variables in our analysis: an indicator for being male, a continuous measure of age, indicators for region, indicators for education level, an indicator for whether the participant’s household is below poverty level, an indicator for the phone surveyor who administered the survey, indicators for consent version (government, research, or policymaker beneficiary), and an indicator for the date when the phone survey was initiated.</p>
 <p>For categorical variables (e.g., gender, education, region, etc) where information is missing, we will add a category for “Unknown”. When information is missing for continuous variables, we will fill in the missing information with the dataset average for that category and add a missing indicator for the variable in question. Thus, if someone’s age is missing and the average age in the dataset is 65.7, we will fill in the missing information with 65.7 and a “Missing Age” indicator will take on a value of 1 for that observation.</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="co"># In progress</span></a></code></pre></div>
-<p>[[To be added: summary tables, balance tables]]</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1"><span class="co"># In progress</span></a></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1"><span class="co"># an indicator for being male</span></a>
+<a class="sourceLine" id="cb36-2" data-line-number="2">dat<span class="op">$</span>male &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">*</span>(dat<span class="op">$</span>dem2 <span class="op">==</span><span class="st"> 'Male'</span>)</a>
+<a class="sourceLine" id="cb36-3" data-line-number="3">dat<span class="op">$</span>male_flag &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">*</span>(<span class="kw">is.na</span>(dat<span class="op">$</span>dem2)) <span class="co"># currently no missingness 5/20/20</span></a>
+<a class="sourceLine" id="cb36-4" data-line-number="4">dat<span class="op">$</span>male_c &lt;-<span class="st"> </span>dat<span class="op">$</span>male <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(dat<span class="op">$</span>male) <span class="co"># mean-centered</span></a>
+<a class="sourceLine" id="cb36-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb36-6" data-line-number="6"><span class="co"># a continuous measure of age</span></a>
+<a class="sourceLine" id="cb36-7" data-line-number="7">dat<span class="op">$</span>age &lt;-<span class="st"> </span>dat<span class="op">$</span>dem1</a>
+<a class="sourceLine" id="cb36-8" data-line-number="8">dat<span class="op">$</span>age_flag &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">*</span>(<span class="kw">is.na</span>(dat<span class="op">$</span>dem1)) <span class="co"># currently no missingness 5/20/20</span></a>
+<a class="sourceLine" id="cb36-9" data-line-number="9">dat[<span class="kw">which</span>(<span class="kw">is.na</span>(dat<span class="op">$</span>dem1))] &lt;-<span class="st"> </span><span class="kw">mean</span>(dat<span class="op">$</span>dem1, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb36-10" data-line-number="10">dat<span class="op">$</span>age_c &lt;-<span class="st"> </span>dat<span class="op">$</span>age <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(dat<span class="op">$</span>age) <span class="co"># mean-centered</span></a>
+<a class="sourceLine" id="cb36-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb36-12" data-line-number="12"><span class="co"># indicators for region</span></a>
+<a class="sourceLine" id="cb36-13" data-line-number="13">dat<span class="op">$</span>reg &lt;-<span class="st"> </span>dat<span class="op">$</span>region &lt;-<span class="st"> </span><span class="kw">factor</span>(dat<span class="op">$</span>dem3) <span class="co"># creates factor for region</span></a>
+<a class="sourceLine" id="cb36-14" data-line-number="14">dat &lt;-<span class="st"> </span>dat <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># creates region dummies</span></a>
+<a class="sourceLine" id="cb36-15" data-line-number="15"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">dummy =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb36-16" data-line-number="16"><span class="st">  </span><span class="kw">spread</span>(<span class="dt">key =</span> reg,</a>
+<a class="sourceLine" id="cb36-17" data-line-number="17">         <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>,</a>
+<a class="sourceLine" id="cb36-18" data-line-number="18">         <span class="dt">value =</span> dummy,</a>
+<a class="sourceLine" id="cb36-19" data-line-number="19">         <span class="dt">fill =</span> <span class="dv">0</span></a>
+<a class="sourceLine" id="cb36-20" data-line-number="20">  ) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># mean-centered variables for regions</span></a>
+<a class="sourceLine" id="cb36-21" data-line-number="21"><span class="st">  </span><span class="kw">mutate_at</span>(<span class="kw">vars</span>(<span class="kw">contains</span>(<span class="st">'reg_'</span>)), <span class="dt">.funs =</span> <span class="kw">list</span>(<span class="dt">c =</span> <span class="op">~</span>.<span class="op">-</span><span class="kw">mean</span>(.)))</a>
+<a class="sourceLine" id="cb36-22" data-line-number="22"></a>
+<a class="sourceLine" id="cb36-23" data-line-number="23"></a>
+<a class="sourceLine" id="cb36-24" data-line-number="24"><span class="co"># indicators for education level</span></a>
+<a class="sourceLine" id="cb36-25" data-line-number="25">dat<span class="op">$</span>ed &lt;-<span class="st"> </span>dat<span class="op">$</span>education &lt;-<span class="st"> </span><span class="kw">factor</span>(dat<span class="op">$</span>dem11) <span class="co"># creates factor for education</span></a>
+<a class="sourceLine" id="cb36-26" data-line-number="26">dat &lt;-<span class="st"> </span>dat <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb36-27" data-line-number="27"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">dummy =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb36-28" data-line-number="28"><span class="st">  </span><span class="kw">spread</span>(<span class="dt">key =</span> ed,</a>
+<a class="sourceLine" id="cb36-29" data-line-number="29">         <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>,</a>
+<a class="sourceLine" id="cb36-30" data-line-number="30">         <span class="dt">value =</span> dummy,</a>
+<a class="sourceLine" id="cb36-31" data-line-number="31">         <span class="dt">fill =</span> <span class="dv">0</span></a>
+<a class="sourceLine" id="cb36-32" data-line-number="32">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb36-33" data-line-number="33"><span class="st">  </span><span class="kw">mutate_at</span>(<span class="kw">vars</span>(<span class="kw">contains</span>(<span class="st">'ed_'</span>)), <span class="dt">.funs =</span> <span class="kw">list</span>(<span class="dt">c =</span> <span class="op">~</span>.<span class="op">-</span><span class="kw">mean</span>(.)))</a>
+<a class="sourceLine" id="cb36-34" data-line-number="34"></a>
+<a class="sourceLine" id="cb36-35" data-line-number="35"></a>
+<a class="sourceLine" id="cb36-36" data-line-number="36"><span class="co"># indicator for whether the participant’s household is below poverty level</span></a>
+<a class="sourceLine" id="cb36-37" data-line-number="37">dat<span class="op">$</span>pov_level &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">*</span>(dat<span class="op">$</span>pov1 <span class="op">==</span><span class="st"> 'a'</span>) <span class="co"># !!!CONFIRM!!!</span></a>
+<a class="sourceLine" id="cb36-38" data-line-number="38">dat<span class="op">$</span>pov_level_flag &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">*</span>(dat<span class="op">$</span>pov1 <span class="op">==</span><span class="st"> </span><span class="dv">-888</span> <span class="op">|</span><span class="st"> </span>dat<span class="op">$</span>pov1 <span class="op">==</span><span class="st"> </span><span class="dv">-999</span>)</a>
+<a class="sourceLine" id="cb36-39" data-line-number="39">dat<span class="op">$</span>pov_level_c &lt;-<span class="st"> </span>dat<span class="op">$</span>pov_level <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(dat<span class="op">$</span>pov_level)</a>
+<a class="sourceLine" id="cb36-40" data-line-number="40">dat<span class="op">$</span>pov_level_flag_c &lt;-<span class="st"> </span>dat<span class="op">$</span>pov_level_flag <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(dat<span class="op">$</span>pov_level_flag)</a>
+<a class="sourceLine" id="cb36-41" data-line-number="41"></a>
+<a class="sourceLine" id="cb36-42" data-line-number="42"><span class="co"># indicator for the phone surveyor who administered the survey</span></a>
+<a class="sourceLine" id="cb36-43" data-line-number="43">dat<span class="op">$</span>sv &lt;-<span class="st"> </span>dat<span class="op">$</span>surveyor &lt;-<span class="st"> </span><span class="kw">factor</span>(dat<span class="op">$</span>survyeorid)</a>
+<a class="sourceLine" id="cb36-44" data-line-number="44">dat &lt;-<span class="st"> </span>dat <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb36-45" data-line-number="45"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">dummy =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb36-46" data-line-number="46"><span class="st">  </span><span class="kw">spread</span>(<span class="dt">key =</span> sv,</a>
+<a class="sourceLine" id="cb36-47" data-line-number="47">         <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>,</a>
+<a class="sourceLine" id="cb36-48" data-line-number="48">         <span class="dt">value =</span> dummy,</a>
+<a class="sourceLine" id="cb36-49" data-line-number="49">         <span class="dt">fill =</span> <span class="dv">0</span></a>
+<a class="sourceLine" id="cb36-50" data-line-number="50">  ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb36-51" data-line-number="51"><span class="st">  </span><span class="kw">mutate_at</span>(<span class="kw">vars</span>(<span class="kw">contains</span>(<span class="st">'sv_'</span>)), <span class="dt">.funs =</span> <span class="kw">list</span>(<span class="dt">c =</span> <span class="op">~</span>.<span class="op">-</span><span class="kw">mean</span>(.)))</a>
+<a class="sourceLine" id="cb36-52" data-line-number="52"></a>
+<a class="sourceLine" id="cb36-53" data-line-number="53"><span class="co"># indicators for consent version (gov, research, or policymaker beneficiary)</span></a>
+<a class="sourceLine" id="cb36-54" data-line-number="54">dat<span class="op">$</span>cv &lt;-<span class="st"> </span>dat<span class="op">$</span>consent_version &lt;-<span class="st"> </span><span class="kw">factor</span>(dat<span class="op">$</span>cons_rand_vers)</a>
+<a class="sourceLine" id="cb36-55" data-line-number="55">dat &lt;-<span class="st"> </span>dat <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb36-56" data-line-number="56"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">dummy =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb36-57" data-line-number="57"><span class="st">  </span><span class="kw">spread</span>(<span class="dt">key =</span> cv,</a>
+<a class="sourceLine" id="cb36-58" data-line-number="58">         <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>,</a>
+<a class="sourceLine" id="cb36-59" data-line-number="59">         <span class="dt">value =</span> dummy,</a>
+<a class="sourceLine" id="cb36-60" data-line-number="60">         <span class="dt">fill =</span> <span class="dv">0</span></a>
+<a class="sourceLine" id="cb36-61" data-line-number="61">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb36-62" data-line-number="62"><span class="st">  </span><span class="kw">mutate_at</span>(<span class="kw">vars</span>(<span class="kw">contains</span>(<span class="st">'cv_'</span>)), <span class="dt">.funs =</span> <span class="kw">list</span>(<span class="dt">c =</span> <span class="op">~</span>.<span class="op">-</span><span class="kw">mean</span>(.)))</a>
+<a class="sourceLine" id="cb36-63" data-line-number="63"></a>
+<a class="sourceLine" id="cb36-64" data-line-number="64"><span class="co"># indicator for the date when the phone survey was initiated. </span></a>
+<a class="sourceLine" id="cb36-65" data-line-number="65">dat<span class="op">$</span>dt &lt;-<span class="st"> </span>dat<span class="op">$</span>int_date &lt;-<span class="st"> </span><span class="kw">factor</span>(dat<span class="op">$</span>date)</a>
+<a class="sourceLine" id="cb36-66" data-line-number="66">dat &lt;-<span class="st"> </span>dat <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb36-67" data-line-number="67"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">dummy =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb36-68" data-line-number="68"><span class="st">  </span><span class="kw">spread</span>(<span class="dt">key =</span> dt,</a>
+<a class="sourceLine" id="cb36-69" data-line-number="69">         <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>,</a>
+<a class="sourceLine" id="cb36-70" data-line-number="70">         <span class="dt">value =</span> dummy,</a>
+<a class="sourceLine" id="cb36-71" data-line-number="71">         <span class="dt">fill =</span> <span class="dv">0</span></a>
+<a class="sourceLine" id="cb36-72" data-line-number="72">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb36-73" data-line-number="73"><span class="st">  </span><span class="kw">mutate_at</span>(<span class="kw">vars</span>(<span class="kw">contains</span>(<span class="st">'dt_'</span>)), <span class="dt">.funs =</span> <span class="kw">list</span>(<span class="dt">c =</span> <span class="op">~</span>.<span class="op">-</span><span class="kw">mean</span>(.)))</a></code></pre></div>
+<p>[[Balance tables to be included]]</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="co"># WIP</span></a></code></pre></div>
 </div>
 <div id="analysis" class="section level3">
 <h3>Analysis</h3>
-<p>For each of our key DV’s, we plan to run an ordinary least squares (OLS) regression with robust standard errors predicting the dependent variable with an indicator for assignment to our treatment condition (this will be our primary predictor variable).</p>
+<p>For each of our key DV’s, we plan to run an ordinary least squares (OLS) regression with (HC2) robust standard errors predicting the dependent variable with an indicator for assignment to our treatment condition (this will be our primary predictor variable).</p>
 <p>As a robustness check, we will also test all our models using logistic regression rather than OLS regression. We will also report a simple difference in means for all our DVs (without any controls).</p>
 <p>Finally, for each DV, we will also report the Lin Estimator: an estimate of our OLS regression model where we include the interaction between an indicator for our treatment and all pre-treatment covariates.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1"><span class="co"># Informational outcomes</span></a>
+<a class="sourceLine" id="cb38-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb38-3" data-line-number="3"><span class="co"># Difference in means</span></a>
+<a class="sourceLine" id="cb38-4" data-line-number="4">lm1i_ols &lt;-<span class="st"> </span><span class="kw">lm</span>(Y_info <span class="op">~</span><span class="st"> </span>treat, <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb38-5" data-line-number="5"><span class="co"># OLS adjusted</span></a>
+<a class="sourceLine" id="cb38-6" data-line-number="6">lm2i_ols &lt;-<span class="st"> </span><span class="kw">lm</span>(Y_info <span class="op">~</span><span class="st"> </span>treat <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-7" data-line-number="7"><span class="st">                 </span>male <span class="op">+</span><span class="st"> </span>male_flag <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>age_flag <span class="op">+</span><span class="st"> </span>region <span class="op">+</span><span class="st"> </span>education <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb38-8" data-line-number="8"><span class="st">                 </span>pov_level <span class="op">+</span><span class="st"> </span>pov_level_flag <span class="op">+</span><span class="st"> </span>surveyor <span class="op">+</span><span class="st"> </span>consent_version <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-9" data-line-number="9"><span class="st">                 </span>int_date, <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb38-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb38-11" data-line-number="11"><span class="co"># Lin estimator</span></a>
+<a class="sourceLine" id="cb38-12" data-line-number="12"><span class="co"># (computed by hand below for regression tables)</span></a>
+<a class="sourceLine" id="cb38-13" data-line-number="13">lm3i_lin &lt;-<span class="st"> </span><span class="kw">lm_lin</span>(Y_info <span class="op">~</span><span class="st"> </span>treat, </a>
+<a class="sourceLine" id="cb38-14" data-line-number="14">                   <span class="dt">covariates =</span> <span class="op">~</span><span class="st"> </span>male <span class="op">+</span><span class="st"> </span>male_flag <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>age_flag <span class="op">+</span><span class="st"> </span>region <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-15" data-line-number="15"><span class="st">                     </span>education <span class="op">+</span><span class="st"> </span>pov_level <span class="op">+</span><span class="st"> </span>pov_level_flag <span class="op">+</span><span class="st"> </span>surveyor <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-16" data-line-number="16"><span class="st">                     </span>consent_version <span class="op">+</span><span class="st"> </span>int_date, <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb38-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb38-18" data-line-number="18"><span class="co"># Logistic regression </span></a>
+<a class="sourceLine" id="cb38-19" data-line-number="19">glm1i_log &lt;-<span class="st"> </span><span class="kw">glm</span>(Y_info <span class="op">~</span><span class="st"> </span>treat, <span class="dt">data =</span> dat, <span class="dt">family =</span> <span class="kw">binomial</span>() )</a>
+<a class="sourceLine" id="cb38-20" data-line-number="20">glm2i_log &lt;-<span class="st"> </span><span class="kw">glm</span>(Y_info <span class="op">~</span><span class="st"> </span>treat <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-21" data-line-number="21"><span class="st">                   </span>male <span class="op">+</span><span class="st"> </span>male_flag <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>age_flag <span class="op">+</span><span class="st"> </span>region <span class="op">+</span><span class="st"> </span>education <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-22" data-line-number="22"><span class="st">                   </span>pov_level <span class="op">+</span><span class="st"> </span>pov_level_flag <span class="op">+</span><span class="st"> </span>surveyor <span class="op">+</span><span class="st"> </span>consent_version <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-23" data-line-number="23"><span class="st">                   </span>int_date, <span class="dt">data =</span> dat, <span class="dt">family =</span> <span class="kw">binomial</span>() )</a>
+<a class="sourceLine" id="cb38-24" data-line-number="24"></a>
+<a class="sourceLine" id="cb38-25" data-line-number="25"></a>
+<a class="sourceLine" id="cb38-26" data-line-number="26"><span class="co"># Stated behavioral outcomes</span></a>
+<a class="sourceLine" id="cb38-27" data-line-number="27"></a>
+<a class="sourceLine" id="cb38-28" data-line-number="28"><span class="co"># OLS</span></a>
+<a class="sourceLine" id="cb38-29" data-line-number="29">lm1b_ols &lt;-<span class="st"> </span><span class="kw">lm</span>(Y_behav <span class="op">~</span><span class="st"> </span>treat, <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb38-30" data-line-number="30"></a>
+<a class="sourceLine" id="cb38-31" data-line-number="31">lm2b_ols &lt;-<span class="st"> </span><span class="kw">lm</span>(Y_behav <span class="op">~</span><span class="st"> </span>treat <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-32" data-line-number="32"><span class="st">                 </span>male <span class="op">+</span><span class="st"> </span>male_flag <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>age_flag <span class="op">+</span><span class="st"> </span>region <span class="op">+</span><span class="st"> </span>education <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb38-33" data-line-number="33"><span class="st">                 </span>pov_level <span class="op">+</span><span class="st"> </span>pov_level_flag <span class="op">+</span><span class="st"> </span>surveyor <span class="op">+</span><span class="st"> </span>consent_version <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-34" data-line-number="34"><span class="st">                 </span>int_date, </a>
+<a class="sourceLine" id="cb38-35" data-line-number="35">               <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb38-36" data-line-number="36"></a>
+<a class="sourceLine" id="cb38-37" data-line-number="37"><span class="co"># Lin estimator</span></a>
+<a class="sourceLine" id="cb38-38" data-line-number="38"><span class="co"># (computed by hand below for regression tables)</span></a>
+<a class="sourceLine" id="cb38-39" data-line-number="39">lm3b_lin &lt;-<span class="st"> </span><span class="kw">lm_lin</span>(Y_behav <span class="op">~</span><span class="st"> </span>treat, </a>
+<a class="sourceLine" id="cb38-40" data-line-number="40">                   <span class="dt">covariates =</span> <span class="op">~</span><span class="st"> </span>male <span class="op">+</span><span class="st"> </span>male_flag <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>age_flag <span class="op">+</span><span class="st"> </span>region <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-41" data-line-number="41"><span class="st">                     </span>education <span class="op">+</span><span class="st"> </span>pov_level <span class="op">+</span><span class="st"> </span>pov_level_flag <span class="op">+</span><span class="st"> </span>surveyor <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-42" data-line-number="42"><span class="st">                     </span>consent_version <span class="op">+</span><span class="st"> </span>int_date, </a>
+<a class="sourceLine" id="cb38-43" data-line-number="43">                   <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb38-44" data-line-number="44"></a>
+<a class="sourceLine" id="cb38-45" data-line-number="45"><span class="co"># Logistic regression </span></a>
+<a class="sourceLine" id="cb38-46" data-line-number="46">glm1b_log &lt;-<span class="st"> </span><span class="kw">glm</span>(Y_behav <span class="op">~</span><span class="st"> </span>treat, <span class="dt">data =</span> dat, <span class="dt">family =</span> <span class="kw">binomial</span>() )</a>
+<a class="sourceLine" id="cb38-47" data-line-number="47">glm2b_log &lt;-<span class="st"> </span><span class="kw">glm</span>(Y_behav <span class="op">~</span><span class="st"> </span>treat <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-48" data-line-number="48"><span class="st">                   </span>male <span class="op">+</span><span class="st"> </span>male_flag <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>age_flag <span class="op">+</span><span class="st"> </span>region <span class="op">+</span><span class="st"> </span>education <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-49" data-line-number="49"><span class="st">                   </span>pov_level <span class="op">+</span><span class="st"> </span>pov_level_flag <span class="op">+</span><span class="st"> </span>surveyor <span class="op">+</span><span class="st"> </span>consent_version <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-50" data-line-number="50"><span class="st">                   </span>int_date, </a>
+<a class="sourceLine" id="cb38-51" data-line-number="51">                 <span class="dt">data =</span> dat, <span class="dt">family =</span> <span class="kw">binomial</span>() )</a></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="kw">stargazer</span>(lm1i_ols, lm2i_ols, lm4i_lin, glm1i_log, glm2i_log, <span class="dt">type =</span> <span class="st">'html'</span>,</a>
+<a class="sourceLine" id="cb39-2" data-line-number="2">          <span class="co"># Standard errors are HC2</span></a>
+<a class="sourceLine" id="cb39-3" data-line-number="3">          <span class="dt">se =</span> <span class="kw">list</span>(<span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm1i_ols, <span class="dt">type =</span> <span class="st">'HC2'</span>))),</a>
+<a class="sourceLine" id="cb39-4" data-line-number="4">              <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm2i_ols, <span class="dt">type =</span> <span class="st">'HC2'</span>))),</a>
+<a class="sourceLine" id="cb39-5" data-line-number="5">              <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm4i_lin, <span class="dt">type =</span> <span class="st">'HC2'</span>)))),</a>
+<a class="sourceLine" id="cb39-6" data-line-number="6">          <span class="dt">add.lines =</span> </a>
+<a class="sourceLine" id="cb39-7" data-line-number="7">            <span class="kw">list</span>(<span class="kw">c</span>(<span class="st">'Covariate adjusted'</span>, <span class="st">'No'</span>, <span class="st">'Yes'</span>,<span class="st">'Yes (Lin)'</span>, <span class="st">'No'</span>, <span class="st">'Yes'</span>)), </a>
+<a class="sourceLine" id="cb39-8" data-line-number="8">          <span class="dt">keep =</span> <span class="kw">c</span>(<span class="st">'^Constant$'</span>, <span class="st">'^treat$'</span>),</a>
+<a class="sourceLine" id="cb39-9" data-line-number="9">          <span class="dt">covariate.labels =</span> <span class="kw">c</span>(<span class="st">'Identifiable Victim'</span>, <span class="ot">NA</span>),</a>
+<a class="sourceLine" id="cb39-10" data-line-number="10">          <span class="dt">dep.var.labels =</span> <span class="kw">c</span>(<span class="st">'Information-Seeking Outcome'</span>),</a>
+<a class="sourceLine" id="cb39-11" data-line-number="11">          <span class="dt">keep.stat =</span> <span class="kw">c</span>(<span class="st">'n'</span>, <span class="st">'rsq'</span>, <span class="st">'adj.rsq'</span>, <span class="st">'ll'</span>) )</a></code></pre></div>
+<table style="text-align:center">
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="5">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="5">
+Information-Seeking Outcome
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="3">
+<em>OLS</em>
+</td>
+<td colspan="2">
+<em>logistic</em>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+<td>
+(3)
+</td>
+<td>
+(4)
+</td>
+<td>
+(5)
+</td>
+</tr>
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Identifiable Victim
+</td>
+<td>
+-0.005
+</td>
+<td>
+-0.011
+</td>
+<td>
+-0.013
+</td>
+<td>
+-0.060
+</td>
+<td>
+-0.236
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.021)
+</td>
+<td>
+(0.021)
+</td>
+<td>
+(0.021)
+</td>
+<td>
+(0.249)
+</td>
+<td>
+(0.304)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+0.910<sup>***</sup>
+</td>
+<td>
+0.744<sup>***</sup>
+</td>
+<td>
+0.914<sup>***</sup>
+</td>
+<td>
+2.319<sup>***</sup>
+</td>
+<td>
+0.819
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.014)
+</td>
+<td>
+(0.159)
+</td>
+<td>
+(0.014)
+</td>
+<td>
+(0.175)
+</td>
+<td>
+(2.072)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Covariate adjusted
+</td>
+<td>
+No
+</td>
+<td>
+Yes
+</td>
+<td>
+Yes (Lin)
+</td>
+<td>
+No
+</td>
+<td>
+Yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.0001
+</td>
+<td>
+0.163
+</td>
+<td>
+0.239
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+-0.001
+</td>
+<td>
+0.090
+</td>
+<td>
+0.096
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Log Likelihood
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-237.028
+</td>
+<td>
+-164.795
+</td>
+</tr>
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="5" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="kw">stargazer</span>(lm1b_ols, lm2b_ols, lm4b_lin, glm1b_log, glm2b_log, <span class="dt">type =</span> <span class="st">'html'</span>, </a>
+<a class="sourceLine" id="cb40-2" data-line-number="2">          <span class="dt">se =</span> <span class="kw">list</span>(<span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm1b_ols, <span class="dt">type =</span> <span class="st">'HC2'</span>))),</a>
+<a class="sourceLine" id="cb40-3" data-line-number="3">              <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm2b_ols, <span class="dt">type =</span> <span class="st">'HC2'</span>))),</a>
+<a class="sourceLine" id="cb40-4" data-line-number="4">              <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm4b_lin, <span class="dt">type =</span> <span class="st">'HC2'</span>)))),</a>
+<a class="sourceLine" id="cb40-5" data-line-number="5">          <span class="dt">add.lines =</span> </a>
+<a class="sourceLine" id="cb40-6" data-line-number="6">            <span class="kw">list</span>(<span class="kw">c</span>(<span class="st">'Covariate adjusted'</span>, <span class="st">'No'</span>, <span class="st">'Yes'</span>,<span class="st">'Yes (Lin)'</span>, <span class="st">'No'</span>, <span class="st">'Yes'</span>)), </a>
+<a class="sourceLine" id="cb40-7" data-line-number="7">          <span class="dt">keep =</span> <span class="kw">c</span>(<span class="st">'^Constant$'</span>, <span class="st">'^treat$'</span>),</a>
+<a class="sourceLine" id="cb40-8" data-line-number="8">          <span class="dt">covariate.labels =</span> <span class="kw">c</span>(<span class="st">'Identifiable Victim'</span>, <span class="ot">NA</span>),</a>
+<a class="sourceLine" id="cb40-9" data-line-number="9">          <span class="dt">dep.var.labels =</span> <span class="kw">c</span>(<span class="st">'Behavioral Outcome'</span>),</a>
+<a class="sourceLine" id="cb40-10" data-line-number="10">          <span class="dt">keep.stat =</span> <span class="kw">c</span>(<span class="st">'n'</span>, <span class="st">'rsq'</span>, <span class="st">'adj.rsq'</span>, <span class="st">'ll'</span>) )</a></code></pre></div>
+<table style="text-align:center">
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="5">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="5">
+Behavioral Outcome
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="3">
+<em>OLS</em>
+</td>
+<td colspan="2">
+<em>logistic</em>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+<td>
+(3)
+</td>
+<td>
+(4)
+</td>
+<td>
+(5)
+</td>
+</tr>
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Identifiable Victim
+</td>
+<td>
+0.011
+</td>
+<td>
+0.011
+</td>
+<td>
+0.010
+</td>
+<td>
+0.203
+</td>
+<td>
+0.289
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.017)
+</td>
+<td>
+(0.016)
+</td>
+<td>
+(0.016)
+</td>
+<td>
+(0.313)
+</td>
+<td>
+(0.399)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+0.938<sup>***</sup>
+</td>
+<td>
+0.508<sup>***</sup>
+</td>
+<td>
+0.937<sup>***</sup>
+</td>
+<td>
+2.713<sup>***</sup>
+</td>
+<td>
+15.217
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.012)
+</td>
+<td>
+(0.124)
+</td>
+<td>
+(0.011)
+</td>
+<td>
+(0.207)
+</td>
+<td>
+(5,667.476)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Covariate adjusted
+</td>
+<td>
+No
+</td>
+<td>
+Yes
+</td>
+<td>
+Yes (Lin)
+</td>
+<td>
+No
+</td>
+<td>
+Yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.001
+</td>
+<td>
+0.201
+</td>
+<td>
+0.255
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+-0.001
+</td>
+<td>
+0.131
+</td>
+<td>
+0.115
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Log Likelihood
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-168.561
+</td>
+<td>
+-110.235
+</td>
+</tr>
+<tr>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="5" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<div id="secondary-analyses" class="section level4">
+<h4>Secondary analyses</h4>
 <p>As exploratory analyses, we will test the following potential moderators for the effect of treatment on each of our DV’s: gender and education level. To test these hypotheses, we will run the regression described in Section 5 above with an added interaction between our treatment indicator and an indicator for the moderator being tested (gender or education level).</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1">lm1i_ols_g &lt;-<span class="st"> </span><span class="kw">lm</span>(Y_info <span class="op">~</span><span class="st"> </span>treat<span class="op">*</span>male, <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb41-2" data-line-number="2">lm2i_ols_g &lt;-<span class="st"> </span><span class="kw">lm</span>(Y_info <span class="op">~</span><span class="st"> </span>treat<span class="op">*</span>male </a>
+<a class="sourceLine" id="cb41-3" data-line-number="3">               <span class="op">+</span><span class="st"> </span>male_flag <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>age_flag <span class="op">+</span><span class="st"> </span>region <span class="op">+</span><span class="st"> </span>education <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb41-4" data-line-number="4"><span class="st">                 </span>pov_level <span class="op">+</span><span class="st"> </span>pov_level_flag <span class="op">+</span><span class="st"> </span>surveyor <span class="op">+</span><span class="st"> </span>consent_version <span class="op">+</span></a>
+<a class="sourceLine" id="cb41-5" data-line-number="5"><span class="st">                 </span>int_date, </a>
+<a class="sourceLine" id="cb41-6" data-line-number="6">               <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb41-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb41-8" data-line-number="8">lm1i_ols_e &lt;-<span class="st"> </span><span class="kw">lm</span>(Y_info <span class="op">~</span><span class="st"> </span>treat<span class="op">*</span>education, <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb41-9" data-line-number="9">lm2i_ols_e &lt;-<span class="st"> </span><span class="kw">lm</span>(Y_info <span class="op">~</span><span class="st"> </span>treat<span class="op">*</span>education <span class="op">+</span></a>
+<a class="sourceLine" id="cb41-10" data-line-number="10"><span class="st">                 </span>male <span class="op">+</span><span class="st"> </span>male_flag <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>age_flag <span class="op">+</span><span class="st"> </span>region <span class="op">+</span></a>
+<a class="sourceLine" id="cb41-11" data-line-number="11"><span class="st">                 </span>pov_level <span class="op">+</span><span class="st"> </span>pov_level_flag <span class="op">+</span><span class="st"> </span>surveyor <span class="op">+</span><span class="st"> </span>consent_version <span class="op">+</span></a>
+<a class="sourceLine" id="cb41-12" data-line-number="12"><span class="st">                 </span>int_date, </a>
+<a class="sourceLine" id="cb41-13" data-line-number="13">               <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb41-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb41-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb41-16" data-line-number="16">lm1b_ols_g &lt;-<span class="st"> </span><span class="kw">lm</span>(Y_info <span class="op">~</span><span class="st"> </span>treat<span class="op">*</span>male, <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb41-17" data-line-number="17">lm2b_ols_g &lt;-<span class="st"> </span><span class="kw">lm</span>(Y_info <span class="op">~</span><span class="st"> </span>treat<span class="op">*</span>male </a>
+<a class="sourceLine" id="cb41-18" data-line-number="18">               <span class="op">+</span><span class="st"> </span>male_flag <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>age_flag <span class="op">+</span><span class="st"> </span>region <span class="op">+</span><span class="st"> </span>education <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb41-19" data-line-number="19"><span class="st">                 </span>pov_level <span class="op">+</span><span class="st"> </span>pov_level_flag <span class="op">+</span><span class="st"> </span>surveyor <span class="op">+</span><span class="st"> </span>consent_version <span class="op">+</span></a>
+<a class="sourceLine" id="cb41-20" data-line-number="20"><span class="st">                 </span>int_date, </a>
+<a class="sourceLine" id="cb41-21" data-line-number="21">               <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb41-22" data-line-number="22"></a>
+<a class="sourceLine" id="cb41-23" data-line-number="23">lm1b_ols_e &lt;-<span class="st"> </span><span class="kw">lm</span>(Y_info <span class="op">~</span><span class="st"> </span>treat<span class="op">*</span>education, <span class="dt">data =</span> dat)</a>
+<a class="sourceLine" id="cb41-24" data-line-number="24">lm2b_ols_e &lt;-<span class="st"> </span><span class="kw">lm</span>(Y_info <span class="op">~</span><span class="st"> </span>treat<span class="op">*</span>education <span class="op">+</span></a>
+<a class="sourceLine" id="cb41-25" data-line-number="25"><span class="st">                 </span>male <span class="op">+</span><span class="st"> </span>male_flag <span class="op">+</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>age_flag <span class="op">+</span><span class="st"> </span>region <span class="op">+</span></a>
+<a class="sourceLine" id="cb41-26" data-line-number="26"><span class="st">                 </span>pov_level <span class="op">+</span><span class="st"> </span>pov_level_flag <span class="op">+</span><span class="st"> </span>surveyor <span class="op">+</span><span class="st"> </span>consent_version <span class="op">+</span></a>
+<a class="sourceLine" id="cb41-27" data-line-number="27"><span class="st">                 </span>int_date, </a>
+<a class="sourceLine" id="cb41-28" data-line-number="28">               <span class="dt">data =</span> dat)</a></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="kw">stargazer</span>(lm1i_ols_g, lm2i_ols_g, lm1i_ols_e, lm2i_ols_e,</a>
+<a class="sourceLine" id="cb42-2" data-line-number="2">          <span class="dt">type =</span> <span class="st">'html'</span>,</a>
+<a class="sourceLine" id="cb42-3" data-line-number="3">          <span class="co"># Standard errors are HC2</span></a>
+<a class="sourceLine" id="cb42-4" data-line-number="4">          <span class="dt">se =</span> <span class="kw">list</span>(<span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm1i_ols_g, <span class="dt">type =</span> <span class="st">'HC2'</span>))),</a>
+<a class="sourceLine" id="cb42-5" data-line-number="5">              <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm2i_ols_g, <span class="dt">type =</span> <span class="st">'HC2'</span>))),</a>
+<a class="sourceLine" id="cb42-6" data-line-number="6">              <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm1i_ols_e, <span class="dt">type =</span> <span class="st">'HC2'</span>))),</a>
+<a class="sourceLine" id="cb42-7" data-line-number="7">              <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm2i_ols_e, <span class="dt">type =</span> <span class="st">'HC2'</span>)))),</a>
+<a class="sourceLine" id="cb42-8" data-line-number="8">          <span class="dt">add.lines =</span> </a>
+<a class="sourceLine" id="cb42-9" data-line-number="9">            <span class="kw">list</span>(<span class="kw">c</span>(<span class="st">'Covariate adjusted'</span>, <span class="st">'No'</span>, <span class="st">'Yes'</span>, <span class="st">'No'</span>, <span class="st">'Yes'</span>),</a>
+<a class="sourceLine" id="cb42-10" data-line-number="10">                 <span class="kw">c</span>(<span class="st">'Moderator'</span>, <span class="st">'Male'</span>, <span class="st">'Male'</span>, <span class="st">'Ed.'</span>, <span class="st">'Ed.'</span>)), </a>
+<a class="sourceLine" id="cb42-11" data-line-number="11">          <span class="dt">keep =</span> <span class="kw">c</span>(<span class="st">'Constant'</span>, <span class="st">'treat'</span>, <span class="st">'male'</span>), </a>
+<a class="sourceLine" id="cb42-12" data-line-number="12">          <span class="co"># covariate.labels = c(NA, 'Identifiable Victim'),</span></a>
+<a class="sourceLine" id="cb42-13" data-line-number="13">          <span class="dt">dep.var.labels =</span> <span class="kw">c</span>(<span class="st">'Information-Seeking Outcome'</span>),</a>
+<a class="sourceLine" id="cb42-14" data-line-number="14">          <span class="dt">keep.stat =</span> <span class="kw">c</span>(<span class="st">'n'</span>, <span class="st">'rsq'</span>, <span class="st">'adj.rsq'</span>, <span class="st">'ll'</span>) )</a></code></pre></div>
+<table style="text-align:center">
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="4">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="4">
+Information-Seeking Outcome
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+<td>
+(3)
+</td>
+<td>
+(4)
+</td>
+</tr>
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat
+</td>
+<td>
+0.004
+</td>
+<td>
+-0.007
+</td>
+<td>
+0.400<sup>**</sup>
+</td>
+<td>
+0.477<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.033)
+</td>
+<td>
+(0.033)
+</td>
+<td>
+(0.183)
+</td>
+<td>
+(0.179)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+male
+</td>
+<td>
+0.039
+</td>
+<td>
+0.022
+</td>
+<td>
+</td>
+<td>
+0.018
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.030)
+</td>
+<td>
+(0.030)
+</td>
+<td>
+</td>
+<td>
+(0.021)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+male_flag
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:male
+</td>
+<td>
+-0.014
+</td>
+<td>
+-0.008
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.043)
+</td>
+<td>
+(0.042)
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:educationMiddle/ Junior High
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.426<sup>**</sup>
+</td>
+<td>
+-0.488<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.188)
+</td>
+<td>
+(0.184)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:educationNone
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.300
+</td>
+<td>
+-0.394<sup>*</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.209)
+</td>
+<td>
+(0.206)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:educationPost-Secondary
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.425<sup>**</sup>
+</td>
+<td>
+-0.528<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.187)
+</td>
+<td>
+(0.183)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:educationPrimary
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.487<sup>**</sup>
+</td>
+<td>
+-0.600<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.202)
+</td>
+<td>
+(0.198)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:educationRefuses to Answer
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.400
+</td>
+<td>
+-0.481
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.448)
+</td>
+<td>
+(0.440)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:educationSecondary or Vocational
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.386<sup>**</sup>
+</td>
+<td>
+-0.464<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.186)
+</td>
+<td>
+(0.182)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+0.887<sup>***</sup>
+</td>
+<td>
+0.742<sup>***</sup>
+</td>
+<td>
+0.600<sup>***</sup>
+</td>
+<td>
+0.500<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.023)
+</td>
+<td>
+(0.159)
+</td>
+<td>
+(0.129)
+</td>
+<td>
+(0.182)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Covariate adjusted
+</td>
+<td>
+No
+</td>
+<td>
+Yes
+</td>
+<td>
+No
+</td>
+<td>
+Yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Moderator
+</td>
+<td>
+Male
+</td>
+<td>
+Male
+</td>
+<td>
+Ed.
+</td>
+<td>
+Ed.
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.003
+</td>
+<td>
+0.163
+</td>
+<td>
+0.017
+</td>
+<td>
+0.177
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+-0.001
+</td>
+<td>
+0.089
+</td>
+<td>
+-0.0001
+</td>
+<td>
+0.098
+</td>
+</tr>
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="4" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="kw">stargazer</span>(lm1b_ols_g, lm2b_ols_g, lm1b_ols_e, lm2b_ols_e,</a>
+<a class="sourceLine" id="cb43-2" data-line-number="2">          <span class="dt">type =</span> <span class="st">'html'</span>,</a>
+<a class="sourceLine" id="cb43-3" data-line-number="3">          <span class="co"># Standard errors are HC2</span></a>
+<a class="sourceLine" id="cb43-4" data-line-number="4">          <span class="dt">se =</span> <span class="kw">list</span>(<span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm1b_ols_g, <span class="dt">type =</span> <span class="st">'HC2'</span>))),</a>
+<a class="sourceLine" id="cb43-5" data-line-number="5">              <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm2b_ols_g, <span class="dt">type =</span> <span class="st">'HC2'</span>))),</a>
+<a class="sourceLine" id="cb43-6" data-line-number="6">              <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm1b_ols_e, <span class="dt">type =</span> <span class="st">'HC2'</span>))),</a>
+<a class="sourceLine" id="cb43-7" data-line-number="7">              <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(lm2b_ols_e, <span class="dt">type =</span> <span class="st">'HC2'</span>)))),</a>
+<a class="sourceLine" id="cb43-8" data-line-number="8">          <span class="dt">add.lines =</span> </a>
+<a class="sourceLine" id="cb43-9" data-line-number="9">            <span class="kw">list</span>(<span class="kw">c</span>(<span class="st">'Covariate adjusted'</span>, <span class="st">'No'</span>, <span class="st">'Yes'</span>, <span class="st">'No'</span>, <span class="st">'Yes'</span>),</a>
+<a class="sourceLine" id="cb43-10" data-line-number="10">                 <span class="kw">c</span>(<span class="st">'Moderator'</span>, <span class="st">'Male'</span>, <span class="st">'Male'</span>, <span class="st">'Ed.'</span>, <span class="st">'Ed.'</span>)), </a>
+<a class="sourceLine" id="cb43-11" data-line-number="11">          <span class="dt">keep =</span> <span class="kw">c</span>(<span class="st">'Constant'</span>, <span class="st">'treat'</span>, <span class="st">'male'</span>), </a>
+<a class="sourceLine" id="cb43-12" data-line-number="12">          <span class="co"># covariate.labels = c(NA, 'Identifiable Victim'),</span></a>
+<a class="sourceLine" id="cb43-13" data-line-number="13">          <span class="dt">dep.var.labels =</span> <span class="kw">c</span>(<span class="st">'Behavioral Outcome'</span>),</a>
+<a class="sourceLine" id="cb43-14" data-line-number="14">          <span class="dt">keep.stat =</span> <span class="kw">c</span>(<span class="st">'n'</span>, <span class="st">'rsq'</span>, <span class="st">'adj.rsq'</span>, <span class="st">'ll'</span>) )</a></code></pre></div>
+<table style="text-align:center">
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="4">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="4">
+Behavioral Outcome
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+<td>
+(3)
+</td>
+<td>
+(4)
+</td>
+</tr>
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat
+</td>
+<td>
+0.004
+</td>
+<td>
+-0.007
+</td>
+<td>
+0.400<sup>**</sup>
+</td>
+<td>
+0.477<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.033)
+</td>
+<td>
+(0.033)
+</td>
+<td>
+(0.183)
+</td>
+<td>
+(0.179)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+male
+</td>
+<td>
+0.039
+</td>
+<td>
+0.022
+</td>
+<td>
+</td>
+<td>
+0.018
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.030)
+</td>
+<td>
+(0.030)
+</td>
+<td>
+</td>
+<td>
+(0.021)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+male_flag
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:male
+</td>
+<td>
+-0.014
+</td>
+<td>
+-0.008
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.043)
+</td>
+<td>
+(0.042)
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:educationMiddle/ Junior High
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.426<sup>**</sup>
+</td>
+<td>
+-0.488<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.188)
+</td>
+<td>
+(0.184)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:educationNone
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.300
+</td>
+<td>
+-0.394<sup>*</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.209)
+</td>
+<td>
+(0.206)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:educationPost-Secondary
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.425<sup>**</sup>
+</td>
+<td>
+-0.528<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.187)
+</td>
+<td>
+(0.183)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:educationPrimary
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.487<sup>**</sup>
+</td>
+<td>
+-0.600<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.202)
+</td>
+<td>
+(0.198)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:educationRefuses to Answer
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.400
+</td>
+<td>
+-0.481
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.448)
+</td>
+<td>
+(0.440)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+treat:educationSecondary or Vocational
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.386<sup>**</sup>
+</td>
+<td>
+-0.464<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.186)
+</td>
+<td>
+(0.182)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+0.887<sup>***</sup>
+</td>
+<td>
+0.742<sup>***</sup>
+</td>
+<td>
+0.600<sup>***</sup>
+</td>
+<td>
+0.500<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.023)
+</td>
+<td>
+(0.159)
+</td>
+<td>
+(0.129)
+</td>
+<td>
+(0.182)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Covariate adjusted
+</td>
+<td>
+No
+</td>
+<td>
+Yes
+</td>
+<td>
+No
+</td>
+<td>
+Yes
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Moderator
+</td>
+<td>
+Male
+</td>
+<td>
+Male
+</td>
+<td>
+Ed.
+</td>
+<td>
+Ed.
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+<td>
+772
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.003
+</td>
+<td>
+0.163
+</td>
+<td>
+0.017
+</td>
+<td>
+0.177
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+-0.001
+</td>
+<td>
+0.089
+</td>
+<td>
+-0.0001
+</td>
+<td>
+0.098
+</td>
+</tr>
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="4" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div id="additional-information" class="section level2">

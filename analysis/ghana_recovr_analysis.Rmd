@@ -11,6 +11,22 @@ output:
     toc_depth: 3
     toc_float: yes
 ---
+
+<style>
+
+table, td, th {
+  border: none;
+  padding-left: 1em;
+  padding-right: 1em;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+</style>
+
+
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   eval = TRUE,
@@ -21,9 +37,12 @@ knitr::opts_chunk$set(
 ```
 
 ```{r load_packages, include = FALSE}
-library(tidyverse)
-library(estimatr)
+library(tidyverse) # data cleaning
+library(estimatr) # lin estimator
+library(stargazer) # tables
+library(sandwich) # Robust SEs
 ```
+
 
 ## Overivew
 The Ghana Core RECOVR project was launched [XXX] by Innovations for Poverty Action, as a nationally representative phone survey delivered to approximately 4,000 respondents. The objective of the study is to [XXX]. 
@@ -33,7 +52,10 @@ The component of the study featured here is an experimental intervention include
 
 Treated participants were asked to *name and reflect on someone at high risk of dying from coronavirus who they care about*. Control participants were not asked these questions. Treatment was assigned to randomly sorted telephone numbers prior to the intervention. 
 
-### Primary hypothesis.
+*The script of the Ghana Core RECOVR survey is linked  [here](https://docs.google.com/spreadsheets/d/1uqAGQHUpbxKGCtAXBXmUp77TwE52Rk0PZgYN2J-WXuo/edit?usp=sharing).*
+
+
+### Primary hypothesis
 
 The primary hypothesis is that treated subjects will be more likely to 
 
@@ -50,82 +72,96 @@ The primary hypothesis is that treated subjects will be more likely to
 ```{r load_data}
 dat <- read_csv('../data/ghana_recovr.csv')
 dat$treat <- 1*(dat$rand1 == 'Identifiable victim')
+
+# some people did not recieve treatment assignment
+table(dat$treat, useNA = 'ifany')
+
+# keep only if consented & received treatment assignment
+dat <- dat %>% 
+  filter(consent_survey == 'Yes',
+         !is.na(treat))
 ```
 
 
 We have two key dependent variables: (1) behavior change intentions and (2) information seeking.
 
-*Behavior change intentions:* Participants are asked “Would you be willing to cancel social activities, avoid going to the markets and crowded places as much as possible, and wash your hands often with soap and water if possible to protect yourself, your loved ones, and other Ghanaians?” The dependent variable is a binary indicator for whether a participant responded with “Yes”. “No” and refusal to respond will both be coded as 0. 
+**Behavior change intentions:** Participants are asked “Would you be willing to cancel social activities, avoid going to the markets and crowded places as much as possible, and wash your hands often with soap and water if possible to protect yourself, your loved ones, and other Ghanaians?” The dependent variable is a binary indicator for whether a participant responded with “Yes”. “No” and refusal to respond will both be coded as 0. 
 
-*Information seeking:* We will offer participants the opportunity to learn about a free service they can use to get more information about coronavirus. Specifically, we will tell them “The best way to protect yourself, your loved ones, and other Ghanaians is to stay informed about COVID-19 and how to prevent its spread. Would you like me to provide you with a phone number you can call to get free and accurate information about coronavirus and learn how you can keep yourself, your loved ones, and other Ghanaians safe?” The dependent variable is a binary indicator for whether participants said “Yes” to this offer. Participants who refuse to reply will be coded as 0 along with those who say “no”.
+**Information seeking:** We will offer participants the opportunity to learn about a free service they can use to get more information about coronavirus. Specifically, we will tell them “The best way to protect yourself, your loved ones, and other Ghanaians is to stay informed about COVID-19 and how to prevent its spread. Would you like me to provide you with a phone number you can call to get free and accurate information about coronavirus and learn how you can keep yourself, your loved ones, and other Ghanaians safe?” The dependent variable is a binary indicator for whether participants said “Yes” to this offer. Participants who refuse to reply will be coded as 0 along with those who say “no”.
 
-*Confirm survey flow, experiment was conducted as expected:*
+**Confirm experiment was delivered as expected:**
 
 ```{r treat_flow}
+# *Treatment delivery
 # (EXP2) Is there anyone you care about who is at high risk of dying from
 # coronavirus?
-table(dat$treat, dat$exp2, useNA = 'always')
+# - confirm only responses for treated individuals
+table(dat$treat, dat$exp2, useNA = 'ifany')
 # (EXP3) *If YES to exp2* Can you tell me about them?
-table(dat$treat, dat$exp3, useNA = 'always')
-table(dat$exp2, dat$exp3, useNA = 'always')
+# - confirm only responses for those individuals that responded 'yes' to exp2
+table(dat$exp2, dat$exp3, useNA = 'ifany')
 
 
+# *Treatment delivery
 # (EXP4) *If NO to exp2* Is there anyone in your neighborhood, family or broader 
 # community who is over sixty-five or has any health problems that could put 
 # them at higher risk?
-table(dat$treat, dat$exp4, useNA = 'always')
-table(dat$exp2, dat$exp4, useNA = 'always')
+# - confirm only responses for those individuals that responeded 'no' to exp2 
+table(dat$exp2, dat$exp4, useNA = 'ifany')
 
+# *Treatment delivery
 # (EXP5) "*If YES to exp4* Can you tell me about them?"
-table(dat$treat, dat$exp5, useNA = 'always')
-table(dat$exp2, dat$exp5, useNA = 'always')
+# - confirm only responses for those individuals that responeded 'no' to exp4 
+table(dat$exp2, dat$exp5, useNA = 'ifany')
 
+# *Treatment delivery
 # (EXP6) *If YES to exp2 or exp4* Can you tell me a bit about why they are 
 # important to you?
-table(dat$treat, dat$exp6, useNA = 'always')
-table(dat$exp2, dat$exp6, useNA = 'always')
-table(dat$exp4, dat$exp6, useNA = 'always')
+# - confirm only responses for those individuals that responeded 'yes' to exp2/4 
+table(dat$exp2, dat$exp6, useNA = 'ifany')
+table(dat$exp4, dat$exp6, useNA = 'ifany')
 
+# *Treatment delivery
 # (EXP7) *If YES to exp2 or exp4*  Would you be upset if something happened to 
 # them?
-table(dat$treat, dat$exp7, useNA = 'always')
-table(dat$exp2, dat$exp7, useNA = 'always')
-table(dat$exp4, dat$exp7, useNA = 'always')
+# - confirm only responses for those individuals that responeded 'yes' to exp2/4 
+table(dat$exp2, dat$exp7, useNA = 'ifany')
+table(dat$exp4, dat$exp7, useNA = 'ifany')
 
+# *Behavioral outcome, treated who received treatment
 # (EXP8) *If YES to exp2 or exp4* I really appreciate you sharing that. Would 
 # you be willing to cancel social activities, avoid going to the markets and 
 # crowded places as much as possible, and wash your hands often with soap and 
 # water if possible to protect yourself, your loved ones, and other Ghanaians?
+# - confirm only responses for those individuals that responeded 'yes' to exp2/4 
+table(dat$exp2, dat$exp8, useNA = 'ifany')
+table(dat$exp4, dat$exp8, useNA = 'ifany')
 
-table(dat$treat, dat$exp8, useNA = 'always')
-table(dat$exp2, dat$exp8, useNA = 'always')
-table(dat$exp4, dat$exp8, useNA = 'always')
-
-
+# *Behavioral outcome, control + treated who did not recieve treatment
 # (EXP9) *If CONTROL or no to exp2 and exp4* Would you be willing to cancel 
 # social activities, avoid going to the markets and crowded places as much as
 # possible, and wash your hands often with soap and water if possible to protect
 # yourself, your loved ones, and other Ghanaians?
+# - confirm only responses for those individuals that responeded 'no' to exp2/4 
+# or control
+table(dat$treat, dat$exp9, useNA = 'ifany')
+table(dat$exp2, dat$exp9, useNA = 'ifany')
+table(dat$exp4, dat$exp9, useNA = 'ifany')
 
-table(dat$treat, dat$exp9, useNA = 'always')
-table(dat$exp2, dat$exp9, useNA = 'always')
-table(dat$exp4, dat$exp9, useNA = 'always')
-
-
+# *Information-seeking outcome, all
 # (EXP10) The best way to protect yourself, your loved ones, and other Ghanaians 
 # is to stay informed about COVID-19 and how to prevent its spread. Would you 
 # like me to provide you with a phone number you can call to get free and 
 # accurate information about coronavirus and learn how you can keep yourself, 
 # your loved ones, and other Ghanaians safe? 
-
-table(dat$treat, dat$exp10, useNA = 'always')
+table(dat$exp10, useNA = 'ifany')
 
 # Code outcome variables
 dat$Y_behav <- 1*(coalesce(dat$exp8, dat$exp9)=='Yes')
-table(dat$Y_behav)
+table(dat$treat, dat$Y_behav)
 
-dat$Y_info <- dat$exp10
-table(dat$Y_info)
+dat$Y_info <- 1*(dat$exp10=='Yes')
+table(dat$treat, dat$Y_info)
 
 ```
 
@@ -137,46 +173,290 @@ For categorical variables (e.g., gender, education, region, etc) where informati
 
 
 ```{r cleaning}
-# In progress
+
+# an indicator for being male
+dat$male <- 1*(dat$dem2 == 'Male')
+dat$male_flag <- 1*(is.na(dat$dem2)) # currently no missingness 5/20/20
+dat$male_c <- dat$male - mean(dat$male) # mean-centered
+
+# a continuous measure of age
+dat$age <- dat$dem1
+dat$age_flag <- 1*(is.na(dat$dem1)) # currently no missingness 5/20/20
+dat[which(is.na(dat$dem1))] <- mean(dat$dem1, na.rm = TRUE)
+dat$age_c <- dat$age - mean(dat$age) # mean-centered
+
+# indicators for region
+dat$reg <- dat$region <- factor(dat$dem3) # creates factor for region
+dat <- dat %>% # creates region dummies
+  mutate(dummy = 1) %>% 
+  spread(key = reg,
+         sep = "_",
+         value = dummy,
+         fill = 0
+  ) %>% # mean-centered variables for regions
+  mutate_at(vars(contains('reg_')), .funs = list(c = ~.-mean(.)))
+
+
+# indicators for education level
+dat$ed <- dat$education <- factor(dat$dem11) # creates factor for education
+dat <- dat %>%
+  mutate(dummy = 1) %>% 
+  spread(key = ed,
+         sep = "_",
+         value = dummy,
+         fill = 0
+  ) %>%
+  mutate_at(vars(contains('ed_')), .funs = list(c = ~.-mean(.)))
+
+
+# indicator for whether the participant’s household is below poverty level
+dat$pov_level <- 1*(dat$pov1 == 'a') # !!!CONFIRM!!!
+dat$pov_level_flag <- 1*(dat$pov1 == -888 | dat$pov1 == -999)
+dat$pov_level_c <- dat$pov_level - mean(dat$pov_level)
+dat$pov_level_flag_c <- dat$pov_level_flag - mean(dat$pov_level_flag)
+
+# indicator for the phone surveyor who administered the survey
+dat$sv <- dat$surveyor <- factor(dat$survyeorid)
+dat <- dat %>%
+  mutate(dummy = 1) %>% 
+  spread(key = sv,
+         sep = "_",
+         value = dummy,
+         fill = 0
+  ) %>%
+  mutate_at(vars(contains('sv_')), .funs = list(c = ~.-mean(.)))
+
+# indicators for consent version (gov, research, or policymaker beneficiary)
+dat$cv <- dat$consent_version <- factor(dat$cons_rand_vers)
+dat <- dat %>% 
+  mutate(dummy = 1) %>% 
+  spread(key = cv,
+         sep = "_",
+         value = dummy,
+         fill = 0
+  ) %>% 
+  mutate_at(vars(contains('cv_')), .funs = list(c = ~.-mean(.)))
+
+# indicator for the date when the phone survey was initiated. 
+dat$dt <- dat$int_date <- factor(dat$date)
+dat <- dat %>% 
+  mutate(dummy = 1) %>% 
+  spread(key = dt,
+         sep = "_",
+         value = dummy,
+         fill = 0
+  ) %>% 
+  mutate_at(vars(contains('dt_')), .funs = list(c = ~.-mean(.)))
 
 ```
 
-[[To be added: summary tables, balance tables]]
+[[Balance tables to be included]]
 
 ```{r balance}
-# In progress
-
+# WIP
 ```
+
+
 
 ### Analysis
 
-For each of our key DV’s, we plan to run an ordinary least squares (OLS) regression with robust standard errors predicting the dependent variable with an indicator for assignment to our treatment condition (this will be our primary predictor variable).
-
- 
-
-```{r}
-
-```
-
-
+For each of our key DV’s, we plan to run an ordinary least squares (OLS) regression with (HC2) robust standard errors predicting the dependent variable with an indicator for assignment to our treatment condition (this will be our primary predictor variable).
 
 As a robustness check, we will also test all our models using logistic regression rather than OLS regression. We will also report a simple difference in means for all our DVs (without any controls). 
 
 Finally, for each DV, we will also report the Lin Estimator: an estimate of our OLS regression model where we include the interaction between an indicator for our treatment and all pre-treatment covariates. 
 
 
-```{r lin}
+```{r analysis}
+# Informational outcomes
+
+# Difference in means
+lm1i_ols <- lm(Y_info ~ treat, data = dat)
+# OLS adjusted
+lm2i_ols <- lm(Y_info ~ treat +
+                 male + male_flag + age + age_flag + region + education + 
+                 pov_level + pov_level_flag + surveyor + consent_version +
+                 int_date, data = dat)
+
+# Lin estimator
+# (computed by hand below for regression tables)
+lm3i_lin <- lm_lin(Y_info ~ treat, 
+                   covariates = ~ male + male_flag + age + age_flag + region +
+                     education + pov_level + pov_level_flag + surveyor +
+                     consent_version + int_date, data = dat)
+
+# Logistic regression 
+glm1i_log <- glm(Y_info ~ treat, data = dat, family = binomial() )
+glm2i_log <- glm(Y_info ~ treat +
+                   male + male_flag + age + age_flag + region + education +
+                   pov_level + pov_level_flag + surveyor + consent_version +
+                   int_date, data = dat, family = binomial() )
+
+
+# Stated behavioral outcomes
+
+# OLS
+lm1b_ols <- lm(Y_behav ~ treat, data = dat)
+
+lm2b_ols <- lm(Y_behav ~ treat +
+                 male + male_flag + age + age_flag + region + education + 
+                 pov_level + pov_level_flag + surveyor + consent_version +
+                 int_date, 
+               data = dat)
+
+# Lin estimator
+# (computed by hand below for regression tables)
+lm3b_lin <- lm_lin(Y_behav ~ treat, 
+                   covariates = ~ male + male_flag + age + age_flag + region +
+                     education + pov_level + pov_level_flag + surveyor +
+                     consent_version + int_date, 
+                   data = dat)
+
+# Logistic regression 
+glm1b_log <- glm(Y_behav ~ treat, data = dat, family = binomial() )
+glm2b_log <- glm(Y_behav ~ treat +
+                   male + male_flag + age + age_flag + region + education +
+                   pov_level + pov_level_flag + surveyor + consent_version +
+                   int_date, 
+                 data = dat, family = binomial() )
+```
+
+```{r lin_hand, echo = FALSE}
+# Just to confirm, if we were to do the Lin estimator by hand;
+# although this will need to be updated with variable names for dates, etc.
+ffi <- paste0(c('Y_info ~ treat*(', 
+               paste0(c('male_c', 'male_flag',
+                        'age_c', 'age_flag', 
+                        paste0('`reg_', levels(dat$region)[-1], '_c`'),
+                        paste0('`ed_', levels(dat$education)[-1], '_c`'),
+                        'pov_level_c', 'pov_level_flag_c', 
+                        paste0('`sv_', levels(dat$surveyor)[-1], '_c`'),
+                        paste0('`cv_', levels(dat$consent_version)[-1], '_c`'),
+                        paste0('`dt_', levels(dat$int_date)[-1], '_c`')), 
+                      collapse = ' + '), ')'), collapse = '')
+
+ffb <- paste0(c('Y_behav ~ treat*(', 
+               paste0(c('male_c', 'male_flag',
+                        'age_c', 'age_flag', 
+                        paste0('`reg_', levels(dat$region)[-1], '_c`'),
+                        paste0('`ed_', levels(dat$education)[-1], '_c`'),
+                        'pov_level_c', 'pov_level_flag_c', 
+                        paste0('`sv_', levels(dat$surveyor)[-1], '_c`'),
+                        paste0('`cv_', levels(dat$consent_version)[-1], '_c`'),
+                        paste0('`dt_', levels(dat$int_date)[-1], '_c`')), 
+                      collapse = ' + '), ')'), collapse = '')
+
+lm4i_lin <- lm(ffi, data = dat)
+
+lm4b_lin <- lm(ffb, data = dat)
+```
+
+```{r tables, results='asis'}
+
+stargazer(lm1i_ols, lm2i_ols, lm4i_lin, glm1i_log, glm2i_log, type = 'html',
+          # Standard errors are HC2
+          se = list(sqrt(diag(vcov(lm1i_ols, type = 'HC2'))),
+              sqrt(diag(vcov(lm2i_ols, type = 'HC2'))),
+              sqrt(diag(vcov(lm4i_lin, type = 'HC2')))),
+          add.lines = 
+            list(c('Covariate adjusted', 'No', 'Yes','Yes (Lin)', 'No', 'Yes')), 
+          keep = c('^Constant$', '^treat$'),
+          covariate.labels = c('Identifiable Victim', NA),
+          dep.var.labels = c('Information-Seeking Outcome'),
+          keep.stat = c('n', 'rsq', 'adj.rsq', 'll') )
+
+
+stargazer(lm1b_ols, lm2b_ols, lm4b_lin, glm1b_log, glm2b_log, type = 'html', 
+          se = list(sqrt(diag(vcov(lm1b_ols, type = 'HC2'))),
+              sqrt(diag(vcov(lm2b_ols, type = 'HC2'))),
+              sqrt(diag(vcov(lm4b_lin, type = 'HC2')))),
+          add.lines = 
+            list(c('Covariate adjusted', 'No', 'Yes','Yes (Lin)', 'No', 'Yes')), 
+          keep = c('^Constant$', '^treat$'),
+          covariate.labels = c('Identifiable Victim', NA),
+          dep.var.labels = c('Behavioral Outcome'),
+          keep.stat = c('n', 'rsq', 'adj.rsq', 'll') )
 
 ```
 
+
+#### Secondary analyses
+
 As exploratory analyses, we will test the following potential moderators for the effect of treatment on each of our DV’s: gender and education level. To test these hypotheses, we will run the regression described in Section 5 above with an added interaction between our treatment indicator and an indicator for the moderator being tested (gender or education level). 
+
+```{r secondary_analysis}
+lm1i_ols_g <- lm(Y_info ~ treat*male, data = dat)
+lm2i_ols_g <- lm(Y_info ~ treat*male 
+               + male_flag + age + age_flag + region + education + 
+                 pov_level + pov_level_flag + surveyor + consent_version +
+                 int_date, 
+               data = dat)
+
+lm1i_ols_e <- lm(Y_info ~ treat*education, data = dat)
+lm2i_ols_e <- lm(Y_info ~ treat*education +
+                 male + male_flag + age + age_flag + region +
+                 pov_level + pov_level_flag + surveyor + consent_version +
+                 int_date, 
+               data = dat)
+
+
+lm1b_ols_g <- lm(Y_info ~ treat*male, data = dat)
+lm2b_ols_g <- lm(Y_info ~ treat*male 
+               + male_flag + age + age_flag + region + education + 
+                 pov_level + pov_level_flag + surveyor + consent_version +
+                 int_date, 
+               data = dat)
+
+lm1b_ols_e <- lm(Y_info ~ treat*education, data = dat)
+lm2b_ols_e <- lm(Y_info ~ treat*education +
+                 male + male_flag + age + age_flag + region +
+                 pov_level + pov_level_flag + surveyor + consent_version +
+                 int_date, 
+               data = dat)
+
+
+```
+
+
+```{r secondary_tables, results='asis'}
+
+stargazer(lm1i_ols_g, lm2i_ols_g, lm1i_ols_e, lm2i_ols_e,
+          type = 'html',
+          # Standard errors are HC2
+          se = list(sqrt(diag(vcov(lm1i_ols_g, type = 'HC2'))),
+              sqrt(diag(vcov(lm2i_ols_g, type = 'HC2'))),
+              sqrt(diag(vcov(lm1i_ols_e, type = 'HC2'))),
+              sqrt(diag(vcov(lm2i_ols_e, type = 'HC2')))),
+          add.lines = 
+            list(c('Covariate adjusted', 'No', 'Yes', 'No', 'Yes'),
+                 c('Moderator', 'Male', 'Male', 'Ed.', 'Ed.')), 
+          keep = c('Constant', 'treat', 'male'), 
+          # covariate.labels = c(NA, 'Identifiable Victim'),
+          dep.var.labels = c('Information-Seeking Outcome'),
+          keep.stat = c('n', 'rsq', 'adj.rsq', 'll') )
+
+stargazer(lm1b_ols_g, lm2b_ols_g, lm1b_ols_e, lm2b_ols_e,
+          type = 'html',
+          # Standard errors are HC2
+          se = list(sqrt(diag(vcov(lm1b_ols_g, type = 'HC2'))),
+              sqrt(diag(vcov(lm2b_ols_g, type = 'HC2'))),
+              sqrt(diag(vcov(lm1b_ols_e, type = 'HC2'))),
+              sqrt(diag(vcov(lm2b_ols_e, type = 'HC2')))),
+          add.lines = 
+            list(c('Covariate adjusted', 'No', 'Yes', 'No', 'Yes'),
+                 c('Moderator', 'Male', 'Male', 'Ed.', 'Ed.')), 
+          keep = c('Constant', 'treat', 'male'), 
+          # covariate.labels = c(NA, 'Identifiable Victim'),
+          dep.var.labels = c('Behavioral Outcome'),
+          keep.stat = c('n', 'rsq', 'adj.rsq', 'll') )
+
+```
 
 ## Additional information
 
 *Outliers and Exclusions.* 
 
 Anyone who fails to reach the section of the phone survey where random assignment would change their experience will be excluded from the study.  Anyone who hears even the beginning of a script that differs due to random assignment will be included and assigned 0’s for both dependent variables if they drop out before dependent variables are collected.
-
 
 
 *Further research*

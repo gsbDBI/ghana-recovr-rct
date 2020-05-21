@@ -2,8 +2,10 @@
 .Rhistory
 .Rapp.history
 
-# Session Data files
+# Data files
 .RData
+*.dta
+ghana_recovr.csv
 
 # User-specific files
 .Ruserdata
@@ -37,3 +39,5 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+.DS_Store
