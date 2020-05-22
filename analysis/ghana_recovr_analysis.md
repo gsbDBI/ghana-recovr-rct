@@ -34,7 +34,7 @@ margin-bottom: 1em;
 
 
 ## Overivew
-The Ghana Core RECOVR project was launched May 6, 2020 by Innovations for Poverty Action, as a nationally representative phone survey delivered to approximately 4,000 respondents. 
+The Ghana Core RECOVR project was launched May 6, 2020 by Innovations for Poverty Action, as a nationally representative phone survey. 
 
 The component of the study featured here is an experimental intervention included in the phone survey, with the objective of using nudges to increase information-seeking behavior. 
 
@@ -42,7 +42,7 @@ The component of the study featured here is an experimental intervention include
 
 # Survey overview
 
-** DATA LAST DOWNLOADED 5/21/20**
+** DATA LAST DOWNLOADED 5/22/20**
 
 ## Demographics
 
@@ -110,7 +110,7 @@ table(dat$treat, useNA = 'ifany')
 ```
 ## 
 ##    0    1 <NA> 
-##  600  573   29
+##  688  640   29
 ```
 
 ```r
@@ -140,8 +140,8 @@ table(dat$treat, dat$Y_behav)
 ```
 ##    
 ##       0   1
-##   0  32 568
-##   1  33 540
+##   0  36 652
+##   1  38 602
 ```
 
 ```r
@@ -152,8 +152,8 @@ table(dat$treat, dat$Y_info)
 ```
 ##    
 ##       0   1
-##   0  60 540
-##   1  48 525
+##   0  67 621
+##   1  57 583
 ```
 
 
@@ -344,17 +344,17 @@ stargazer(lm1i_ols, lm2i_ols, lm4i_lin, glm1i_log, glm2i_log, type = 'html',
 <tr><td style="text-align:left"></td><td colspan="5">Information-Seeking Outcome</td></tr>
 <tr><td style="text-align:left"></td><td colspan="3"><em>OLS</em></td><td colspan="2"><em>logistic</em></td></tr>
 <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td><td>(5)</td></tr>
-<tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Identifiable Victim</td><td>0.016</td><td>0.010</td><td>0.005</td><td>0.195</td><td>-0.008</td></tr>
-<tr><td style="text-align:left"></td><td>(0.017)</td><td>(0.017)</td><td>(0.017)</td><td>(0.203)</td><td>(0.240)</td></tr>
+<tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Identifiable Victim</td><td>0.008</td><td>0.001</td><td>-0.001</td><td>0.098</td><td>-0.110</td></tr>
+<tr><td style="text-align:left"></td><td>(0.016)</td><td>(0.016)</td><td>(0.016)</td><td>(0.189)</td><td>(0.219)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">Constant</td><td>0.900<sup>***</sup></td><td>0.937<sup>***</sup></td><td>0.906<sup>***</sup></td><td>2.197<sup>***</sup></td><td>18.349</td></tr>
-<tr><td style="text-align:left"></td><td>(0.012)</td><td>(0.174)</td><td>(0.012)</td><td>(0.136)</td><td>(5,311.326)</td></tr>
+<tr><td style="text-align:left">Constant</td><td>0.903<sup>***</sup></td><td>1.085<sup>***</sup></td><td>0.906<sup>***</sup></td><td>2.227<sup>***</sup></td><td>36.252</td></tr>
+<tr><td style="text-align:left"></td><td>(0.011)</td><td>(0.212)</td><td>(0.011)</td><td>(0.129)</td><td>(7,048.619)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Covariate adjusted</td><td>No</td><td>Yes</td><td>Yes (Lin)</td><td>No</td><td>Yes</td></tr>
-<tr><td style="text-align:left">Observations</td><td>1,173</td><td>1,166</td><td>1,173</td><td>1,173</td><td>1,166</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.001</td><td>0.147</td><td>0.187</td><td></td><td></td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>-0.0001</td><td>0.096</td><td>0.086</td><td></td><td></td></tr>
-<tr><td style="text-align:left">Log Likelihood</td><td></td><td></td><td></td><td>-360.006</td><td>-261.014</td></tr>
+<tr><td style="text-align:left">Observations</td><td>1,328</td><td>1,328</td><td>1,328</td><td>1,328</td><td>1,328</td></tr>
+<tr><td style="text-align:left">R<sup>2</sup></td><td>0.0002</td><td>0.134</td><td>0.178</td><td></td><td></td></tr>
+<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>-0.001</td><td>0.084</td><td>0.079</td><td></td><td></td></tr>
+<tr><td style="text-align:left">Log Likelihood</td><td></td><td></td><td></td><td>-411.908</td><td>-306.781</td></tr>
 <tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="5" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
 </table>
 
@@ -377,17 +377,17 @@ stargazer(lm1b_ols, lm2b_ols, lm4b_lin, glm1b_log, glm2b_log, type = 'html',
 <tr><td style="text-align:left"></td><td colspan="5">Behavioral Outcome</td></tr>
 <tr><td style="text-align:left"></td><td colspan="3"><em>OLS</em></td><td colspan="2"><em>logistic</em></td></tr>
 <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td><td>(5)</td></tr>
-<tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Identifiable Victim</td><td>-0.004</td><td>-0.004</td><td>-0.006</td><td>-0.081</td><td>-0.102</td></tr>
-<tr><td style="text-align:left"></td><td>(0.013)</td><td>(0.013)</td><td>(0.013)</td><td>(0.255)</td><td>(0.316)</td></tr>
+<tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Identifiable Victim</td><td>-0.007</td><td>-0.006</td><td>-0.006</td><td>-0.134</td><td>-0.134</td></tr>
+<tr><td style="text-align:left"></td><td>(0.013)</td><td>(0.012)</td><td>(0.012)</td><td>(0.239)</td><td>(0.302)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">Constant</td><td>0.947<sup>***</sup></td><td>0.748<sup>***</sup></td><td>0.946<sup>***</sup></td><td>2.876<sup>***</sup></td><td>36.342</td></tr>
-<tr><td style="text-align:left"></td><td>(0.009)</td><td>(0.132)</td><td>(0.009)</td><td>(0.182)</td><td>(9,235.670)</td></tr>
+<tr><td style="text-align:left">Constant</td><td>0.948<sup>***</sup></td><td>1.218<sup>***</sup></td><td>0.946<sup>***</sup></td><td>2.897<sup>***</sup></td><td>56.940</td></tr>
+<tr><td style="text-align:left"></td><td>(0.009)</td><td>(0.156)</td><td>(0.008)</td><td>(0.171)</td><td>(11,822.680)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Covariate adjusted</td><td>No</td><td>Yes</td><td>Yes (Lin)</td><td>No</td><td>Yes</td></tr>
-<tr><td style="text-align:left">Observations</td><td>1,173</td><td>1,166</td><td>1,173</td><td>1,173</td><td>1,166</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.0001</td><td>0.226</td><td>0.250</td><td></td><td></td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>-0.001</td><td>0.180</td><td>0.157</td><td></td><td></td></tr>
-<tr><td style="text-align:left">Log Likelihood</td><td></td><td></td><td></td><td>-251.155</td><td>-166.899</td></tr>
+<tr><td style="text-align:left">Observations</td><td>1,328</td><td>1,328</td><td>1,328</td><td>1,328</td><td>1,328</td></tr>
+<tr><td style="text-align:left">R<sup>2</sup></td><td>0.0002</td><td>0.250</td><td>0.289</td><td></td><td></td></tr>
+<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>-0.001</td><td>0.207</td><td>0.204</td><td></td><td></td></tr>
+<tr><td style="text-align:left">Log Likelihood</td><td></td><td></td><td></td><td>-285.407</td><td>-184.595</td></tr>
 <tr><td colspan="6" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="5" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
 </table>
 
@@ -452,44 +452,44 @@ stargazer(lm1i_ols_g, lm2i_ols_g, lm1i_ols_e, lm2i_ols_e,
 <tr><td></td><td colspan="4" style="border-bottom: 1px solid black"></td></tr>
 <tr><td style="text-align:left"></td><td colspan="4">Information-Seeking Outcome</td></tr>
 <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td></tr>
-<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">treat</td><td>0.011</td><td>0.009</td><td>-0.000</td><td>0.036</td></tr>
-<tr><td style="text-align:left"></td><td>(0.027)</td><td>(0.027)</td><td>(0.333)</td><td>(0.326)</td></tr>
+<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">treat</td><td>-0.009</td><td>-0.016</td><td>-0.000</td><td>0.072</td></tr>
+<tr><td style="text-align:left"></td><td>(0.026)</td><td>(0.025)</td><td>(0.336)</td><td>(0.330)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">male</td><td>0.025</td><td>0.015</td><td></td><td>0.016</td></tr>
-<tr><td style="text-align:left"></td><td>(0.024)</td><td>(0.024)</td><td></td><td>(0.017)</td></tr>
+<tr><td style="text-align:left">male</td><td>0.026</td><td>0.017</td><td></td><td>0.031<sup>*</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(0.023)</td><td>(0.022)</td><td></td><td>(0.016)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="text-align:left">male_flag</td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:male</td><td>0.007</td><td>0.001</td><td></td><td></td></tr>
-<tr><td style="text-align:left"></td><td>(0.035)</td><td>(0.034)</td><td></td><td></td></tr>
+<tr><td style="text-align:left">treat:male</td><td>0.026</td><td>0.027</td><td></td><td></td></tr>
+<tr><td style="text-align:left"></td><td>(0.033)</td><td>(0.032)</td><td></td><td></td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationKindergarten</td><td></td><td></td><td>0.286</td><td>0.268</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.365)</td><td>(0.357)</td></tr>
+<tr><td style="text-align:left">treat:educationKindergarten</td><td></td><td></td><td>0.286</td><td>0.236</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.368)</td><td>(0.360)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationMiddle/ Junior High</td><td></td><td></td><td>-0.011</td><td>-0.037</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.335)</td><td>(0.328)</td></tr>
+<tr><td style="text-align:left">treat:educationMiddle/ Junior High</td><td></td><td></td><td>-0.033</td><td>-0.101</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.337)</td><td>(0.332)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationNone</td><td></td><td></td><td>0.107</td><td>0.011</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.343)</td><td>(0.335)</td></tr>
+<tr><td style="text-align:left">treat:educationNone</td><td></td><td></td><td>0.114</td><td>-0.015</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.344)</td><td>(0.337)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationPost-Secondary</td><td></td><td></td><td>0.004</td><td>-0.048</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.335)</td><td>(0.328)</td></tr>
+<tr><td style="text-align:left">treat:educationPost-Secondary</td><td></td><td></td><td>-0.003</td><td>-0.089</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.337)</td><td>(0.331)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationPrimary</td><td></td><td></td><td>-0.082</td><td>-0.135</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.342)</td><td>(0.334)</td></tr>
+<tr><td style="text-align:left">treat:educationPrimary</td><td></td><td></td><td>-0.078</td><td>-0.169</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.344)</td><td>(0.337)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationSecondary or Vocational</td><td></td><td></td><td>0.037</td><td>-0.003</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.335)</td><td>(0.328)</td></tr>
+<tr><td style="text-align:left">treat:educationSecondary or Vocational</td><td></td><td></td><td>0.035</td><td>-0.043</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.337)</td><td>(0.331)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">Constant</td><td>0.885<sup>***</sup></td><td>0.938<sup>***</sup></td><td>1.000<sup>***</sup></td><td>0.917<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.019)</td><td>(0.175)</td><td>(0.289)</td><td>(0.295)</td></tr>
+<tr><td style="text-align:left">Constant</td><td>0.887<sup>***</sup></td><td>1.101<sup>***</sup></td><td>1.000<sup>***</sup></td><td>1.024<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(0.018)</td><td>(0.213)</td><td>(0.291)</td><td>(0.325)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
 <tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Covariate adjusted</td><td>No</td><td>Yes</td><td>No</td><td>Yes</td></tr>
 <tr><td style="text-align:left">Moderator</td><td>Male</td><td>Male</td><td>Ed.</td><td>Ed.</td></tr>
-<tr><td style="text-align:left">Observations</td><td>1,173</td><td>1,166</td><td>1,173</td><td>1,166</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.003</td><td>0.147</td><td>0.014</td><td>0.153</td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.001</td><td>0.095</td><td>0.003</td><td>0.097</td></tr>
+<tr><td style="text-align:left">Observations</td><td>1,328</td><td>1,328</td><td>1,328</td><td>1,328</td></tr>
+<tr><td style="text-align:left">R<sup>2</sup></td><td>0.005</td><td>0.134</td><td>0.012</td><td>0.140</td></tr>
+<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.002</td><td>0.084</td><td>0.002</td><td>0.086</td></tr>
 <tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="4" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
 </table>
 
@@ -515,44 +515,44 @@ stargazer(lm1b_ols_g, lm2b_ols_g, lm1b_ols_e, lm2b_ols_e,
 <tr><td></td><td colspan="4" style="border-bottom: 1px solid black"></td></tr>
 <tr><td style="text-align:left"></td><td colspan="4">Behavioral Outcome</td></tr>
 <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td></tr>
-<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">treat</td><td>0.011</td><td>0.009</td><td>-0.000</td><td>0.036</td></tr>
-<tr><td style="text-align:left"></td><td>(0.027)</td><td>(0.027)</td><td>(0.333)</td><td>(0.326)</td></tr>
+<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">treat</td><td>-0.009</td><td>-0.016</td><td>-0.000</td><td>0.072</td></tr>
+<tr><td style="text-align:left"></td><td>(0.026)</td><td>(0.025)</td><td>(0.336)</td><td>(0.330)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">male</td><td>0.025</td><td>0.015</td><td></td><td>0.016</td></tr>
-<tr><td style="text-align:left"></td><td>(0.024)</td><td>(0.024)</td><td></td><td>(0.017)</td></tr>
+<tr><td style="text-align:left">male</td><td>0.026</td><td>0.017</td><td></td><td>0.031<sup>*</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(0.023)</td><td>(0.022)</td><td></td><td>(0.016)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="text-align:left">male_flag</td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:male</td><td>0.007</td><td>0.001</td><td></td><td></td></tr>
-<tr><td style="text-align:left"></td><td>(0.035)</td><td>(0.034)</td><td></td><td></td></tr>
+<tr><td style="text-align:left">treat:male</td><td>0.026</td><td>0.027</td><td></td><td></td></tr>
+<tr><td style="text-align:left"></td><td>(0.033)</td><td>(0.032)</td><td></td><td></td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationKindergarten</td><td></td><td></td><td>0.286</td><td>0.268</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.365)</td><td>(0.357)</td></tr>
+<tr><td style="text-align:left">treat:educationKindergarten</td><td></td><td></td><td>0.286</td><td>0.236</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.368)</td><td>(0.360)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationMiddle/ Junior High</td><td></td><td></td><td>-0.011</td><td>-0.037</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.335)</td><td>(0.328)</td></tr>
+<tr><td style="text-align:left">treat:educationMiddle/ Junior High</td><td></td><td></td><td>-0.033</td><td>-0.101</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.337)</td><td>(0.332)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationNone</td><td></td><td></td><td>0.107</td><td>0.011</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.343)</td><td>(0.335)</td></tr>
+<tr><td style="text-align:left">treat:educationNone</td><td></td><td></td><td>0.114</td><td>-0.015</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.344)</td><td>(0.337)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationPost-Secondary</td><td></td><td></td><td>0.004</td><td>-0.048</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.335)</td><td>(0.328)</td></tr>
+<tr><td style="text-align:left">treat:educationPost-Secondary</td><td></td><td></td><td>-0.003</td><td>-0.089</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.337)</td><td>(0.331)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationPrimary</td><td></td><td></td><td>-0.082</td><td>-0.135</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.342)</td><td>(0.334)</td></tr>
+<tr><td style="text-align:left">treat:educationPrimary</td><td></td><td></td><td>-0.078</td><td>-0.169</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.344)</td><td>(0.337)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">treat:educationSecondary or Vocational</td><td></td><td></td><td>0.037</td><td>-0.003</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.335)</td><td>(0.328)</td></tr>
+<tr><td style="text-align:left">treat:educationSecondary or Vocational</td><td></td><td></td><td>0.035</td><td>-0.043</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td><td>(0.337)</td><td>(0.331)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">Constant</td><td>0.885<sup>***</sup></td><td>0.938<sup>***</sup></td><td>1.000<sup>***</sup></td><td>0.917<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.019)</td><td>(0.175)</td><td>(0.289)</td><td>(0.295)</td></tr>
+<tr><td style="text-align:left">Constant</td><td>0.887<sup>***</sup></td><td>1.101<sup>***</sup></td><td>1.000<sup>***</sup></td><td>1.024<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(0.018)</td><td>(0.213)</td><td>(0.291)</td><td>(0.325)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
 <tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Covariate adjusted</td><td>No</td><td>Yes</td><td>No</td><td>Yes</td></tr>
 <tr><td style="text-align:left">Moderator</td><td>Male</td><td>Male</td><td>Ed.</td><td>Ed.</td></tr>
-<tr><td style="text-align:left">Observations</td><td>1,173</td><td>1,166</td><td>1,173</td><td>1,166</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.003</td><td>0.147</td><td>0.014</td><td>0.153</td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.001</td><td>0.095</td><td>0.003</td><td>0.097</td></tr>
+<tr><td style="text-align:left">Observations</td><td>1,328</td><td>1,328</td><td>1,328</td><td>1,328</td></tr>
+<tr><td style="text-align:left">R<sup>2</sup></td><td>0.005</td><td>0.134</td><td>0.012</td><td>0.140</td></tr>
+<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.002</td><td>0.084</td><td>0.002</td><td>0.086</td></tr>
 <tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="4" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
 </table>
 
@@ -560,7 +560,7 @@ stargazer(lm1b_ols_g, lm2b_ols_g, lm1b_ols_e, lm2b_ols_e,
 
 *Outliers and Exclusions.* 
 
-Anyone who fails to reach the section of the phone survey where random assignment would change their experience will be excluded from the study.  Anyone who hears even the beginning of a script that differs due to random assignment will be included and assigned 0’s for both dependent variables if they drop out before dependent variables are collected.
+Anyone who fails to reach the section of the phone survey where random assignment would change their experience will be excluded from the study.  Anyone who hears even the beginning of a script that differs due to random assignment will be included and assigned 0s for both dependent variables if they drop out before dependent variables are collected.
 
 
 *Further research*

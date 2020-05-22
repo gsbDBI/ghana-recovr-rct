@@ -53,7 +53,7 @@ theme_set(theme_bw())
 
 
 ## Overivew
-The Ghana Core RECOVR project was launched May 6, 2020 by Innovations for Poverty Action, as a nationally representative phone survey delivered to approximately 4,000 respondents. 
+The Ghana Core RECOVR project was launched May 6, 2020 by Innovations for Poverty Action, as a nationally representative phone survey. 
 
 The component of the study featured here is an experimental intervention included in the phone survey, with the objective of using nudges to increase information-seeking behavior. 
 
@@ -61,7 +61,7 @@ The component of the study featured here is an experimental intervention include
 
 # Survey overview
 
-** DATA LAST DOWNLOADED 5/21/20**
+** DATA LAST DOWNLOADED 5/22/20**
 
 ## Demographics
 
@@ -644,7 +644,7 @@ stargazer(lm1b_ols_g, lm2b_ols_g, lm1b_ols_e, lm2b_ols_e,
 
 *Outliers and Exclusions.* 
 
-Anyone who fails to reach the section of the phone survey where random assignment would change their experience will be excluded from the study.  Anyone who hears even the beginning of a script that differs due to random assignment will be included and assigned 0’s for both dependent variables if they drop out before dependent variables are collected.
+Anyone who fails to reach the section of the phone survey where random assignment would change their experience will be excluded from the study.  Anyone who hears even the beginning of a script that differs due to random assignment will be included and assigned 0s for both dependent variables if they drop out before dependent variables are collected.
 
 
 *Further research*
