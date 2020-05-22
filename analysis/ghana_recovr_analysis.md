@@ -34,7 +34,7 @@ margin-bottom: 1em;
 
 
 ## Overivew
-The Ghana Core RECOVR project was launched [XXX] by Innovations for Poverty Action, as a nationally representative phone survey delivered to approximately 4,000 respondents. The objective of the study is to [XXX]. 
+The Ghana Core RECOVR project was launched May 6, 2020 by Innovations for Poverty Action, as a nationally representative phone survey delivered to approximately 4,000 respondents. 
 
 The component of the study featured here is an experimental intervention included in the phone survey, with the objective of using nudges to increase information-seeking behavior. 
 
@@ -48,11 +48,10 @@ The component of the study featured here is an experimental intervention include
 
 Selected questions. 
 
-**[[To add: income/poverty distribution]]**
 
 ![](ghana_recovr_analysis_files/figure-html/overview-1.png)<!-- -->![](ghana_recovr_analysis_files/figure-html/overview-2.png)<!-- -->![](ghana_recovr_analysis_files/figure-html/overview-3.png)<!-- -->![](ghana_recovr_analysis_files/figure-html/overview-4.png)<!-- -->
 
-
+**[[To add: income/poverty distribution]]**
 
 ## COVID-19 
 Selected questions. 
@@ -128,228 +127,9 @@ We have two key dependent variables: (1) behavior change intentions and (2) info
 
 **Information seeking:** We will offer participants the opportunity to learn about a free service they can use to get more information about coronavirus. Specifically, we will tell them “The best way to protect yourself, your loved ones, and other Ghanaians is to stay informed about COVID-19 and how to prevent its spread. Would you like me to provide you with a phone number you can call to get free and accurate information about coronavirus and learn how you can keep yourself, your loved ones, and other Ghanaians safe?” The dependent variable is a binary indicator for whether participants said “Yes” to this offer. Participants who refuse to reply will be coded as 0 along with those who say “no”.
 
-**Confirm experiment was delivered as expected:**
 
 
-```r
-# *Treatment delivery
-# (EXP2) Is there anyone you care about who is at high risk of dying from
-# coronavirus?
-# - confirm only responses for treated individuals
-table(dat$treat, dat$exp2, useNA = 'ifany')
-```
 
-```
-##    
-##      No Yes <NA>
-##   0   0   0  600
-##   1 454 119    0
-```
-
-```r
-# (EXP3) *If YES to exp2* Can you tell me about them?
-# - confirm only responses for those individuals that responded 'yes' to exp2
-table(dat$exp2, dat$exp3, useNA = 'ifany')
-```
-
-```
-##       
-##        Yes, respondent thinks of or identifies an individual <NA>
-##   No                                                       0  454
-##   Yes                                                    119    0
-##   <NA>                                                     0  600
-```
-
-```r
-# *Treatment delivery
-# (EXP4) *If NO to exp2* Is there anyone in your neighborhood, family or broader 
-# community who is over sixty-five or has any health problems that could put 
-# them at higher risk?
-# - confirm only responses for those individuals that responeded 'no' to exp2 
-table(dat$exp2, dat$exp4, useNA = 'ifany')
-```
-
-```
-##       
-##         .r  No Yes <NA>
-##   No     6 394  54    0
-##   Yes    0   0   0  119
-##   <NA>   0   0   0  600
-```
-
-```r
-# *Treatment delivery
-# (EXP5) '*If YES to exp4* Can you tell me about them?'
-# - confirm only responses for those individuals that responeded 'no' to exp4 
-table(dat$exp2, dat$exp5, useNA = 'ifany')
-```
-
-```
-##       
-##        Yes, respondent thinks of or identifies an individual <NA>
-##   No                                                      54  400
-##   Yes                                                      0  119
-##   <NA>                                                     0  600
-```
-
-```r
-# *Treatment delivery
-# (EXP6) *If YES to exp2 or exp4* Can you tell me a bit about why they are 
-# important to you?
-# - confirm only responses for those individuals that responeded 'yes' to exp2/4 
-table(dat$exp2, dat$exp6, useNA = 'ifany')
-```
-
-```
-##       
-##        Refused, respondent didn't say anything
-##   No                                         4
-##   Yes                                        6
-##   <NA>                                       0
-##       
-##        Yes, respondent thinks of or identifies an individual <NA>
-##   No                                                      50  400
-##   Yes                                                    113    0
-##   <NA>                                                     0  600
-```
-
-```r
-table(dat$exp4, dat$exp6, useNA = 'ifany')
-```
-
-```
-##       
-##        Refused, respondent didn't say anything
-##   .r                                         0
-##   No                                         0
-##   Yes                                        4
-##   <NA>                                       6
-##       
-##        Yes, respondent thinks of or identifies an individual <NA>
-##   .r                                                       0    6
-##   No                                                       0  394
-##   Yes                                                     50    0
-##   <NA>                                                   113  600
-```
-
-```r
-# *Treatment delivery
-# (EXP7) *If YES to exp2 or exp4*  Would you be upset if something happened to 
-# them?
-# - confirm only responses for those individuals that responeded 'yes' to exp2/4 
-table(dat$exp2, dat$exp7, useNA = 'ifany')
-```
-
-```
-##       
-##         .r  No Yes <NA>
-##   No     1   2  51  400
-##   Yes    0   4 115    0
-##   <NA>   0   0   0  600
-```
-
-```r
-table(dat$exp4, dat$exp7, useNA = 'ifany')
-```
-
-```
-##       
-##         .r  No Yes <NA>
-##   .r     0   0   0    6
-##   No     0   0   0  394
-##   Yes    1   2  51    0
-##   <NA>   0   4 115  600
-```
-
-```r
-# *Behavioral outcome, treated who received treatment
-# (EXP8) *If YES to exp2 or exp4* I really appreciate you sharing that. Would 
-# you be willing to cancel social activities, avoid going to the markets and 
-# crowded places as much as possible, and wash your hands often with soap and 
-# water if possible to protect yourself, your loved ones, and other Ghanaians?
-# - confirm only responses for those individuals that responeded 'yes' to exp2/4 
-table(dat$exp2, dat$exp8, useNA = 'ifany')
-```
-
-```
-##       
-##         No Yes <NA>
-##   No     1  53  400
-##   Yes    4 115    0
-##   <NA>   0   0  600
-```
-
-```r
-table(dat$exp4, dat$exp8, useNA = 'ifany')
-```
-
-```
-##       
-##         No Yes <NA>
-##   .r     0   0    6
-##   No     0   0  394
-##   Yes    1  53    0
-##   <NA>   4 115  600
-```
-
-```r
-# *Behavioral outcome, control + treated who did not recieve treatment
-# (EXP9) *If CONTROL or no to exp2 and exp4* Would you be willing to cancel 
-# social activities, avoid going to the markets and crowded places as much as
-# possible, and wash your hands often with soap and water if possible to protect
-# yourself, your loved ones, and other Ghanaians?
-# - confirm only responses for those individuals that responeded 'no' to exp2/4 
-# or control
-table(dat$treat, dat$exp9, useNA = 'ifany')
-```
-
-```
-##    
-##      .d  No Yes <NA>
-##   0   1  31 568    0
-##   1   1  27 372  173
-```
-
-```r
-table(dat$exp2, dat$exp9, useNA = 'ifany')
-```
-
-```
-##       
-##         .d  No Yes <NA>
-##   No     1  27 372   54
-##   Yes    0   0   0  119
-##   <NA>   1  31 568    0
-```
-
-```r
-table(dat$exp4, dat$exp9, useNA = 'ifany')
-```
-
-```
-##       
-##         .d  No Yes <NA>
-##   .r     0   0   6    0
-##   No     1  27 366    0
-##   Yes    0   0   0   54
-##   <NA>   1  31 568  119
-```
-
-```r
-# *Information-seeking outcome, all
-# (EXP10) The best way to protect yourself, your loved ones, and other Ghanaians 
-# is to stay informed about COVID-19 and how to prevent its spread. Would you 
-# like me to provide you with a phone number you can call to get free and 
-# accurate information about coronavirus and learn how you can keep yourself, 
-# your loved ones, and other Ghanaians safe? 
-table(dat$exp10, useNA = 'ifany')
-```
-
-```
-## 
-##   No  Yes 
-##  108 1065
-```
 
 ```r
 # Code outcome variables
@@ -376,6 +156,7 @@ table(dat$treat, dat$Y_info)
 ##   1  48 525
 ```
 
+
 ### Cleaning
 
 We will include the following control variables in our analysis: an indicator for being male, a continuous measure of age, indicators for region, indicators for education level, an indicator for whether the participant’s household is below poverty level, an indicator for the phone surveyor who administered the survey, indicators for consent version (government, research, or policymaker beneficiary), and an indicator for the date when the phone survey was initiated. 
@@ -386,15 +167,18 @@ For categorical variables (e.g., gender, education, region, etc) where informati
 
 ```r
 # an indicator for being male
-dat$male <- 1*(dat$dem2 == 'Male')
-dat$male_flag <- 1*(is.na(dat$dem2)) # currently no missingness 5/20/20
-dat$male_c <- dat$male - mean(dat$male) # mean-centered
-
+dat <- dat %>% 
+    mutate(male = 1 *( replace_na(dem2, 0) == 'Male'),
+         # currently no missingness 5/20/20
+         male_flag = 1*(dem2 == -888 | dem2 == -999 | is.na(dem2)),
+         male_c = male - mean(male), # mean-centered
+         male_flag_c = male_flag - mean(male_flag), 
 # a continuous measure of age
-dat$age <- dat$dem1
-dat$age_flag <- 1*(is.na(dat$dem1)) # currently no missingness 5/20/20
-dat[which(is.na(dat$dem1))] <- mean(dat$dem1, na.rm = TRUE)
-dat$age_c <- dat$age - mean(dat$age) # mean-centered
+         age = replace_na(dem1, mean(dem1, na.rm = TRUE)),
+         # currently no missingness 5/20/20
+         age_flag = 1*(dem1 == -888 | dem1 == -999 | is.na(dem1)),
+         age_c = age - mean(age), # mean-centered
+         age_flag_c = age_flag - mean(age_flag))
 
 # indicators for region
 dat$reg <- dat$region <- factor(dat$dem3) # creates factor for region
@@ -410,54 +194,54 @@ dat <- dat %>% # creates region dummies
 
 # indicators for education level
 dat$ed <- dat$education <- factor(dat$dem11) # creates factor for education
-dat <- dat %>%
+dat <- dat %>% # creates education dummies
   mutate(dummy = 1) %>% 
   spread(key = ed,
          sep = '_',
          value = dummy,
          fill = 0
-  ) %>%
+  ) %>% # mean-centered variable
   mutate_at(vars(contains('ed_')), .funs = list(c = ~.-mean(.)))
 
 
 # indicator for whether the participant’s household is below poverty level
-dat$pov_level <- 1*(dat$pov1 == 'a') # !!!CONFIRM!!!
-dat$pov_level[which(is.na(dat$pov1))] <- 0
-dat$pov_level_flag <- 1*(dat$pov1 == -888 | dat$pov1 == -999 | is.na(dat$pov1))
-dat$pov_level_c <- dat$pov_level - mean(dat$pov_level, na.rm = TRUE)
-dat$pov_level_flag_c <- dat$pov_level_flag - mean(dat$pov_level_flag)
+dat <- dat %>% 
+  mutate(pov_level = 1 *( replace_na(pov1, 0) == 'a'), # !!!CONFIRM!!!
+         pov_level_flag = 1*(pov1 == -888 | pov1 == -999 | is.na(pov1)),
+         pov_level_c = pov_level - mean(pov_level),
+         pov_level_flag_c = pov_level_flag - mean(pov_level_flag))
 
 # indicator for the phone surveyor who administered the survey
 dat$sv <- dat$surveyor <- factor(dat$survyeorid)
-dat <- dat %>%
+dat <- dat %>% # creates surveyor dummies
   mutate(dummy = 1) %>% 
   spread(key = sv,
          sep = '_',
          value = dummy,
          fill = 0
-  ) %>%
+  ) %>% # mean-centered variable
   mutate_at(vars(contains('sv_')), .funs = list(c = ~.-mean(.)))
 
 # indicators for consent version (gov, research, or policymaker beneficiary)
 dat$cv <- dat$consent_version <- factor(dat$cons_rand_vers)
-dat <- dat %>% 
+dat <- dat %>% # creates consent dummies
   mutate(dummy = 1) %>% 
   spread(key = cv,
          sep = '_',
          value = dummy,
          fill = 0
-  ) %>% 
+  ) %>%  # mean-centered variable
   mutate_at(vars(contains('cv_')), .funs = list(c = ~.-mean(.)))
 
 # indicator for the date when the phone survey was initiated. 
 dat$dt <- dat$int_date <- factor(dat$date)
-dat <- dat %>% 
+dat <- dat %>%  # creates date dummies
   mutate(dummy = 1) %>% 
   spread(key = dt,
          sep = '_',
          value = dummy,
          fill = 0
-  ) %>% 
+  ) %>%  # mean-centered variable
   mutate_at(vars(contains('dt_')), .funs = list(c = ~.-mean(.)))
 ```
 
@@ -472,9 +256,12 @@ dat <- dat %>%
 
 ### Analysis
 
-For each of our key DV’s, we plan to run an ordinary least squares (OLS) regression with (HC2) robust standard errors predicting the dependent variable with an indicator for assignment to our treatment condition (this will be our primary predictor variable).
 
-As a robustness check, we will also test all our models using logistic regression rather than OLS regression. We will also report a simple difference in means for all our DVs (without any controls). 
+
+For each of our key DVs, we report an unadjusted difference in means.
+We also run ordinary least squares (OLS) regression with (HC2) robust standard errors predicting the dependent variable with an indicator for assignment to our treatment condition.
+
+As a robustness check, we also test all our models using logistic regression rather than OLS regression.  
 
 Finally, for each DV, we will also report the Lin Estimator: an estimate of our OLS regression model where we include the interaction between an indicator for our treatment and all pre-treatment covariates. 
 
@@ -607,7 +394,7 @@ stargazer(lm1b_ols, lm2b_ols, lm4b_lin, glm1b_log, glm2b_log, type = 'html',
 
 #### Secondary analyses
 
-As exploratory analyses, we will test the following potential moderators for the effect of treatment on each of our DV’s: gender and education level. To test these hypotheses, we will run the regression described in Section 5 above with an added interaction between our treatment indicator and an indicator for the moderator being tested (gender or education level). 
+As exploratory analyses, we test the following potential moderators for the effect of treatment on each of our DV’s: gender and education level. To test these hypotheses, we run the regressions described in Section 5 above with an added interaction between our treatment indicator and an indicator for the moderator being tested (gender or education level). 
 
 
 ```r
