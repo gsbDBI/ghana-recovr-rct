@@ -2,7 +2,7 @@
 
 This repository hosts reproducible analysis of an experiment conducted as part of the Innovations for Poverty Action Core RECOVR survey implemented in Ghana in spring 2020. 
 
-Last updated: May 2020, 2020. 
+Last updated: May 22, 2020. 
 
 **Current status** Preliminary results, data collection is still underway. 
 
