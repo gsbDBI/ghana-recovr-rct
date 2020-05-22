@@ -33,7 +33,7 @@ margin-bottom: 1em;
 
 
 
-## Overivew
+## Overview
 The Ghana Core RECOVR project was launched May 6, 2020 by Innovations for Poverty Action, as a nationally representative phone survey. 
 
 The component of the study featured here is an experimental intervention included in the phone survey, with the objective of using nudges to increase information-seeking behavior. 
@@ -51,7 +51,10 @@ Selected questions.
 
 ![](ghana_recovr_analysis_files/figure-html/overview-1.png)<!-- -->![](ghana_recovr_analysis_files/figure-html/overview-2.png)<!-- -->![](ghana_recovr_analysis_files/figure-html/overview-3.png)<!-- -->![](ghana_recovr_analysis_files/figure-html/overview-4.png)<!-- -->
 
-**[[To add: income/poverty distribution]]**
+**To add: poverty distribution. We will use the Poverty Probability Index prepared by IPA; the methodology for this index is proprietary, so they will provide us with the final variable for inclusion in analysis, and we can cite PPI for transparency.**
+
+Per IPA: 
+"The Poverty Probability Index uses a stability selection algorithm with elastic-net logistic regression to identify five variables that jointly predict poverty status and consumption quintile for each household. This will provide more flexible and more credible estimates of poverty rates, while also using a statistical model built before the recent crisis, allowing us to estimate 'baseline' household welfare before the (potentially quite large) increase in poverty rates currently unfolding."
 
 ## COVID-19 
 Selected questions. 
@@ -161,7 +164,7 @@ table(dat$treat, dat$Y_info)
 
 We will include the following control variables in our analysis: an indicator for being male, a continuous measure of age, indicators for region, indicators for education level, an indicator for whether the participant’s household is below poverty level, an indicator for the phone surveyor who administered the survey, indicators for consent version (government, research, or policymaker beneficiary), and an indicator for the date when the phone survey was initiated. 
 
-For categorical variables (e.g., gender, education, region, etc) where information is missing, we will add a category for “Unknown”. When information is missing for continuous variables, we will fill in the missing information with the dataset average for that category and add a missing indicator for the variable in question. Thus, if someone’s age is missing and the average age in the dataset is 65.7, we will fill in the missing information with 65.7 and a “Missing Age” indicator will take on a value of 1 for that observation.
+For categorical variables (e.g., gender, education, region, etc) where information is missing, we will add a category for “Unknown”. When information is missing for continuous variables, we will fill in the missing information with the data set average for that category and add a missing indicator for the variable in question. Thus, if someone’s age is missing and the average age in the data set is 65.7, we will fill in the missing information with 65.7 and a “Missing Age” indicator will take on a value of 1 for that observation.
 
 
 
@@ -205,8 +208,9 @@ dat <- dat %>% # creates education dummies
 
 
 # indicator for whether the participant’s household is below poverty level
+# !!! PLACEHOLDER To be replaced with final PPI variable provided by IPA!!!
 dat <- dat %>% 
-  mutate(pov_level = 1 *( replace_na(pov1, 0) == 'a'), # !!!CONFIRM!!!
+  mutate(pov_level = 1 *( replace_na(pov1, 0) == 'a'), 
          pov_level_flag = 1*(pov1 == -888 | pov1 == -999 | is.na(pov1)),
          pov_level_c = pov_level - mean(pov_level),
          pov_level_flag_c = pov_level_flag - mean(pov_level_flag))
