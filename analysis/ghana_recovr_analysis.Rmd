@@ -61,7 +61,7 @@ The component of the study featured here is an experimental intervention include
 
 # Survey overview
 
-** DATA LAST DOWNLOADED 5/22/20**
+** DATA LAST DOWNLOADED 6/1/20**
 
 ## Demographics
 
@@ -92,11 +92,11 @@ ggplot(dat, aes(x=dem1, fill = dem2)) +
              color=gg_color_hue(2)[2], linetype='dashed') +
   annotate(geom = 'text', 
            x = filter(mean_age, dem2 == 'Female')$age+3, 
-           label = filter(mean_age, dem2 == 'Female')$age, y=70, 
+           label = filter(mean_age, dem2 == 'Female')$age, y=90, 
            color = gg_color_hue(2)[1]) +
   annotate(geom = 'text', 
            x = filter(mean_age, dem2 == 'Male')$age+3, 
-           label = filter(mean_age, dem2 == 'Male')$age, y=75, 
+           label = filter(mean_age, dem2 == 'Male')$age, y=95, 
            color = gg_color_hue(2)[2]) +
   labs(fill = 'Sex') +
   xlab('Age')
@@ -111,15 +111,15 @@ ggplot(dat, aes(x=factor(dem11,
   labs(fill = 'Sex') + 
   xlab('Education')
 
-
 # Household size
-ggplot(dat, aes(x=dem9)) + 
+mean_hh <- mean(as.numeric(dat$dem9), na.rm = TRUE)
+ggplot(dat, aes(x=as.numeric(dem9))) + 
   geom_histogram() + 
-  geom_vline(aes(xintercept = round(mean(dat$dem9), 2)), 
+  geom_vline(aes(xintercept = round(mean_hh, 2)), 
              linetype='dashed') +
   annotate(geom = 'text', 
-           x = round(mean(dat$dem9), 2)+2, 
-           label = round(mean(dat$dem9), 2), y=170,) +
+           x = round(mean_hh, 2)+2, 
+           label = round(mean_hh, 2), y=375,) +
   xlab('Household Size')
 
 ```
