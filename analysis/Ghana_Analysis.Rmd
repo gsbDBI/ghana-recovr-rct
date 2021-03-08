@@ -1,0 +1,427 @@
+---
+title: "Ghana Analysis"
+output: html_document
+---
+
+
+
+```{r PSA Download & Clean}
+library(openxlsx)
+library(sandwich)
+library(lmtest)
+psa_sample <- read.xlsx("IPA SMS Sample.xlsx", sheet= "PSA")
+
+psa1 <- read.xlsx("Week1PSA.xlsx", sheet= "Day1")
+psa3 <- read.xlsx("Week1PSA.xlsx", sheet= "Day3")
+psa5 <- read.xlsx("Week1PSA.xlsx", sheet = "Day5")
+psa5f <- read.xlsx("Week1PSA.xlsx", sheet = "Day5Follow")
+psa8 <- read.xlsx("Week2PSA.xlsx", sheet = "Day8")
+psa10 <- read.xlsx("Week2PSA.xlsx", sheet = "Day10")
+psa12 <- read.xlsx("Week2PSA.xlsx", sheet = "Day12")
+psa12f <- read.xlsx("Week2PSA.xlsx", sheet = "Day12Follow")
+psa15 <- read.xlsx("Week3PSA.xlsx", sheet = "Day15")
+psa18 <- read.xlsx("Week3PSA.xlsx", sheet = "Day18")
+psa20 <- read.xlsx("Week3PSA.xlsx", sheet = "Day20")
+psa28 <- read.xlsx("Week4PSA.xlsx", sheet = "Day28")
+psa28f <- read.xlsx("Week4PSA.xlsx", sheet = "Day28Follow")
+
+psa_ids <- psa_sample$phone.number
+psa <- as.data.frame(psa_ids)
+
+# mask info
+maskinfo_ids <- psa3$Phone.Number[which(psa3$DVMaskInfo == 1)]
+psa$DVMaskInfo <- ifelse(psa$psa_ids %in% maskinfo_ids, 1, 0)
+
+#public transport
+psa <- merge(psa, psa5[,c("DVPublicTransport", "Phone.Number")], by.x = "psa_ids", by.y = "Phone.Number", all.x=TRUE)
+
+# more info #1
+moreinfo_ids <- c(psa5$Phone.Number[which(psa5$DVMoreInfo1==1)], psa5f$Phone.Number[which(psa5f$DVMoreInfo1==1)])
+psa$DVMoreInfo1 <- ifelse(psa$psa_ids %in% moreinfo_ids, 1, 0)
+
+# tricks info
+tricksinfo_ids <- psa10$Phone.Number[which(psa10$DVTricksInfo == 1)]
+psa$DVTricksInfo <- ifelse(psa$psa_ids %in% tricksinfo_ids, 1, 0)
+
+#leave home
+psa <- merge(psa, psa12[,c("DVLeaveHome", "Phone")], by.x = "psa_ids", by.y = "Phone", all.x=TRUE)
+
+#phone number provided
+number_ids <- c(psa12$Phone[which(psa12$DVNumber>0)], psa12f$Phone.Number[which(psa12f$DVNumber > 0)])
+psa$DVNumber <- ifelse(psa$psa_ids %in% number_ids, 1, 0)
+psa12.2 <- merge(psa12[,c("numberCount", "Phone")], 
+                 psa12f[,c("numberCount", "Phone.Number")], 
+                 by.x = c("Phone", "numberCount"), 
+                 by.y = c("Phone.Number", "numberCount"), all.x=TRUE)
+
+psa <- merge(psa, psa12.2, by.x = "psa_ids", by.y = "Phone", all.x=TRUE) 
+
+# risk info
+riskinfo_ids <- psa15$Phone.Number[which(psa15$DVRiskInfo == 1)]
+psa$DVRiskInfo <- ifelse(psa$psa_ids %in% riskinfo_ids, 1, 0)
+
+#hand wash
+psa <- merge(psa, psa20[,c("DVHandWash", "Phone.Number")], by.x = "psa_ids", by.y = "Phone.Number", all.x=TRUE)
+psa$DVHandWash[which(psa$DVHandWash == "(No Response)")] <- NA
+
+#touch outside home
+psa <- merge(psa, psa28[,c("DVTouch", "Phone.Number")], by.x = "psa_ids", by.y = "Phone.Number", all.x=TRUE)
+
+# more info #2
+moreinfo_ids2 <- c(psa28$Phone.Number[which(psa28$DVMoreInfo2==1)], psa28f$Phone.Number[which(psa28f$DVMoreInfo2==1)])
+psa$DVMoreInfo2 <- ifelse(psa$psa_ids %in% moreinfo_ids2, 1, 0)
+```
+
+```{r Q&A Download}
+library(openxlsx)
+qa_sample <- read.xlsx("IPA SMS Sample.xlsx", sheet= "Q&A")
+
+qa1 <- read.xlsx("Week1QA.xlsx", sheet= "Day1")
+qa1f <- read.xlsx("Week1QA.xlsx", sheet= "Day1Follow")
+qa3 <- read.xlsx("Week1QA.xlsx", sheet= "Day3")
+qa3f <- read.xlsx("Week1QA.xlsx", sheet= "Day3Follow")
+qa5 <- read.xlsx("Week1QA.xlsx", sheet= "Day5")
+qa5f <- read.xlsx("Week1QA.xlsx", sheet= "Day5Follow")
+qa8 <- read.xlsx("Week2QA.xlsx", sheet= "Day8")
+qa8f <- read.xlsx("Week2QA.xlsx", sheet= "Day8Follow")
+qa10 <- read.xlsx("Week2QA.xlsx", sheet= "Day10")
+qa10f <- read.xlsx("Week2QA.xlsx", sheet= "Day10Follow")
+qa12 <- read.xlsx("Week2QA.xlsx", sheet= "Day12")
+qa12f <- read.xlsx("Week2QA.xlsx", sheet= "Day12Follow")
+qa15 <- read.xlsx("Week3QA.xlsx", sheet= "Day15")
+qa15f <- read.xlsx("Week3QA.xlsx", sheet= "Day15Follow")
+qa18 <- read.xlsx("Week3QA.xlsx", sheet= "Day18")
+qa18f <- read.xlsx("Week3QA.xlsx", sheet= "Day18Follow")
+qa20 <- read.xlsx("Week3QA.xlsx", sheet= "Day20")
+qa28 <- read.xlsx("Week4QA.xlsx", sheet = "Day28")
+qa28f <- read.xlsx("Week4QA.xlsx", sheet = "Day28Follow")
+
+qa_ids <- qa_sample$phone.number
+qa <- as.data.frame(qa_ids)
+
+# mask info
+maskinfo_ids <- c(qa3$Phone.Number[which(qa3$DVMaskInfo==1)], qa3f$Phone.Number[which(qa3f$DVMaskInfo==1)])
+qa$DVMaskInfo <- ifelse(qa$qa_ids %in% maskinfo_ids, 1, 0)
+
+#public transport
+qa <- merge(qa, qa5[,c("DVPublicTransport", "Phone.Number")], by.x = "qa_ids", by.y = "Phone.Number", all.x=TRUE)
+
+# more info #1
+moreinfo_ids <- c(qa5$Phone.Number[which(qa5$DVMoreInfo1==1)], qa5f$Phone.Number[which(qa5f$DVMoreInfo1==1)])
+qa$DVMoreInfo1 <- ifelse(qa$qa_ids %in% moreinfo_ids, 1, 0)
+
+# tricks info
+tricksinfo_ids <- c(qa10$Phone.Number[which(qa10$DVTricksInfo == 1)], qa10f$Phone.Number[which(qa10f$DVTricksInfo == 1)])
+qa$DVTricksInfo <- ifelse(qa$qa_ids %in% tricksinfo_ids, 1, 0)
+
+#leave home
+qa <- merge(qa, qa12[,c("DVLeaveHome", "Phone")], by.x = "qa_ids", by.y = "Phone", all.x=TRUE)
+
+#phone number provided
+number_ids <- c(qa12$Phone[which(qa12$DVNumber>0)], qa12f$Phone.Number[which(qa12f$DVNumber > 0)])
+qa$DVNumber <- ifelse(qa$qa_ids %in% number_ids, 1, 0)
+
+# sums phone numbers given even if numCount is missing; should only change 9 obs at the end
+qa12f[,c("numberCount")] <- apply(qa12f[, c(3:5)], 1, function(x) sum(suppressWarnings(as.numeric(x)>0), na.rm = TRUE))
+qa12.2 <- merge(qa12[,c("numberCount", "Phone")], 
+                 qa12f[,c("numberCount", "Phone.Number")], 
+                 by.x = c("Phone", "numberCount"), 
+                 by.y = c("Phone.Number", "numberCount"), all.x=TRUE)
+
+qa <- merge(qa, qa12.2, by.x = "qa_ids", by.y = "Phone", all.x=TRUE)
+# fix what Molly thinks is a data error
+qa$numberCount[which(qa$qa_ids == '233266128151')] <- 0
+
+# risk info
+riskinfo_ids <- c(qa15$Phone.Number[which(qa15$DVRiskInfo == 1)], qa15f$Phone.Number[which(qa15f$DVRiskInfo == 1)])
+qa$DVRiskInfo <- ifelse(qa$qa_ids %in% riskinfo_ids, 1, 0)
+
+#hand wash
+qa <- merge(qa, qa20[,c("DVHandWash", "Phone.Number")], by.x = "qa_ids", by.y = "Phone.Number", all.x=TRUE)
+qa$DVHandWash[which(qa$DVHandWash == "(No Response)")] <- NA
+
+#touch outside home
+qa <- merge(qa, qa28[,c("DVTouch", "Phone.Number")], by.x = "qa_ids", by.y = "Phone.Number", all.x=TRUE)
+
+# more info #2
+moreinfo_ids2 <- c(qa28$Phone.Number[which(qa28$DVMoreInfo2==1)], qa28f$Phone.Number[which(qa28f$DVMoreInfo2==1)])
+qa$DVMoreInfo2 <- ifelse(qa$qa_ids %in% moreinfo_ids2, 1, 0)
+```
+
+```{r ivr download}
+ivr <- read.xlsx("IVR-survey.xlsx", sheet = "part")
+# remove duplicate phone #s
+ivr <- ivr[-which(duplicated(ivr$Phone.Number)),]
+
+```
+
+
+```{r merge}
+qa$ids <- qa$qa_ids
+psa$ids <- psa$psa_ids
+colnames(qa)[1] <- "Condition"
+colnames(psa)[1] <- "Condition"
+qa$Condition <- "Q&A"
+psa$Condition <- "PSA"
+
+# full results
+cov <- rbind(qa, psa)
+
+# 4823 IVR participants missing from our sample
+length(which(!(ivr$Phone.Number %in% cov$ids)))
+
+# find repeated across samples, and remove. Final sample size = 11585
+repeat_nums <- psa$ids[which(psa$ids %in% qa$ids)]
+cov <- cov[-which(cov$ids %in% repeat_nums),]
+
+## add ivr/recruitment info
+ind <- which(cov$ids %in% ivr$Phone.Number)
+cov$Recruitment <- "Phone"
+cov$Recruitment[ind] <- "IVR"
+cov <- merge(cov, ivr[,c("Phone.Number", "Call.Date")], by.x = "ids", by.y = "Phone.Number", all.x= TRUE, all.y = FALSE)
+cov$RecruitDate <- as.Date(cov$Call.Date, origin = "1899-12-30")
+cov$RecruitDate[which(is.na(cov$RecruitDate))] <- as.Date("05/22/20", format = "%m/%d/%y")
+cov$RecruitDif <- difftime(as.Date("12/10/20", format = "%m/%d/%y"), cov$RecruitDate, units = "days")
+
+## DV Prep
+
+# (1) Self-reported behavior change: once a week, we will ask participants about a different health behavior via text message. The questions will be as following:
+#Week 1: “How many of the past 7 days did you travel via public transportation? Reply with a number from 0 to 7.” The dependent variable is the number reported. Missing values due to non-response will be replaced by the “worst” answer on our response scale (7).
+# reverse coded so that bigger = better for forming the composite change
+cov$DVPublicTransport <- cov$DVPublicTransport-1
+cov$DVPublicTransport_Main <- 7-cov$DVPublicTransport
+cov$DVPublicTransport_Main[which(is.na(cov$DVPublicTransport_Main))] <- 0
+
+#Week 2: “How many of the past 7 days did you leave home for non-work reasons like praying or meeting friends and family? Reply with a number from 0 to 7.” The dependent variable is the number reported. Missing values due to non-response will be replaced by the “worst” answer on our response scale (7).
+cov$DVLeaveHome_Main <- 7-cov$DVLeaveHome
+cov$DVLeaveHome_Main[which(is.na(cov$DVLeaveHome_Main))] <- 0
+#Week 3: “Did you wash your hands with soap under running water the last time you returned home from an outing? Text 1 for Yes, 2 for No, and 3 for I can’t.” The dependent variable is a binary indicator for whether or not participants chose “Yes” as their response. “No” and “I can’t” will be coded as 0. Missing values due to non-response will be coded as “No” (0).
+cov$DVHandWash <- as.numeric(cov$DVHandWash)
+cov$DVHandWash_Main <- ifelse(cov$DVHandWash == 1, 1, 0)
+cov$DVHandWash_Main[which(is.na(cov$DVHandWash_Main))] <- 0
+#Week 4: “In the past week, did you touch, hug, or shake hands with anyone outside your household, including family? Text 1 for No; Text 2 for Yes” The dependent variable is a binary indicator for whether participants chose “No” as their response. “Yes” will be coded as 0. Missing values due to non-response will be coded as “Yes” (0).
+#The primary dependent variable is a behavior change composite score formed by averaging the z-scores for each of the individual outcomes (a-d). As a robustness check, we will also report each outcome separately.
+
+#The primary dependent variable is a behavior change composite score formed by averaging the z-scores for each of the individual outcomes (a-d). As a robustness check, we will also report each outcome separately.
+cov$DVHandWash_MainZ <- (cov$DVHandWash_Main-mean(cov$DVHandWash_Main))/sd(cov$DVHandWash_Main)
+cov$DVLeaveHome_MainZ <- (cov$DVLeaveHome_Main-mean(cov$DVLeaveHome_Main))/sd(cov$DVLeaveHome_Main)
+cov$DVPublicTransport_MainZ <- (cov$DVPublicTransport_Main-mean(cov$DVPublicTransport_Main))/sd(cov$DVPublicTransport_Main)
+cov$DVBehaviorChange <- (cov$DVHandWash_MainZ + cov$DVLeaveHome_MainZ + cov$DVPublicTransport_MainZ)/3
+
+#(2) Information seeking: On give separate occasions, we will ask participants to “TEXT 1” if they want more information about resources they can use to learn about COVID or about a particular topic (for example, mask wearing on week 1). The dependent variable is the participants’ overall information-seeking score, or the number of times participants sought more information by texting “1” (this will take on a value that could be as low as 0 and as high as 5). As a robustness check, we will also report each information-seeking outcome separately.
+cov$InfoSeek <- cov$DVMoreInfo1+cov$DVMaskInfo+cov$DVTricksInfo+cov$DVRiskInfo+cov$DVMoreInfo2
+
+
+#(3) Information sharing: during Week 2 of our messaging campaign, we will offer participants the opportunity to share information with their friends and family members by texting us their phone numbers. Participants can share up to three phone numbers. The dependent variable is a continuous variable indicating how many unique phone numbers participants shared (this will take on a value between 0 and 3).
+cov$numberCount[which(is.na(cov$numberCount))] <- 0
+```
+
+```{r analyze}
+# First, for our continuous DV’s, we plan to run t-tests comparing the dependent variable (number of times participants traveled via public transport; number of days participant left home for non-work reasons; number of phone numbers shared; total participant information-seeking score) across conditions. For our binary DV’s, we plan to run two sample proportions tests comparing the proportion of participants who complied with the dependent variable (washed their hands after their last outing; avoided touching anyone outside their household) across conditions.
+
+# un-reverse code for the t-test
+cov$DVPublicTransport_Main <- 7-cov$DVPublicTransport_Main
+t.test(cov$DVPublicTransport_Main~cov$Condition)
+cov$DVLeaveHome_Main <- 7 - cov$DVLeaveHome_Main
+t.test(cov$DVLeaveHome_Main~cov$Condition) 
+
+# behavior change composite
+t.test(cov$DVBehaviorChange~cov$Condition) 
+
+#information seeking
+t.test(cov$InfoSeek~cov$Condition) 
+
+# information sharing
+t.test(cov$numberCount ~ cov$Condition) 
+
+# handwashing
+p1 <- length(which(cov$DVHandWash_Main == 1 & cov$Condition == "Q&A"))
+p2 <- length(which(cov$DVHandWash_Main == 1 & cov$Condition == "PSA"))
+n1 <- length(which(cov$Condition == "Q&A"))
+n2 <- length(which(cov$Condition == "PSA"))
+
+prop.test(c(p1, p2), c(n1, n2), correct = FALSE) 
+
+# sharing numbers yes/no
+p1 <- length(which(cov$DVNumber == 1 & cov$Condition == "Q&A"))
+p2 <- length(which(cov$DVNumber == 1 & cov$Condition == "PSA"))
+n1 <- length(which(cov$Condition == "Q&A"))
+n2 <- length(which(cov$Condition == "PSA"))
+
+prop.test(c(p1, p2), c(n1, n2), correct = FALSE) 
+
+# Mask information 
+p1 <- length(which(cov$DVMaskInfo == 1 & cov$Condition == "Q&A"))
+p2 <- length(which(cov$DVMaskInfo == 1 & cov$Condition == "PSA"))
+n1 <- length(which(cov$Condition == "Q&A"))
+n2 <- length(which(cov$Condition == "PSA"))
+
+prop.test(c(p1, p2), c(n1, n2), correct = FALSE) 
+
+# More free info
+p1 <- length(which(cov$DVMoreInfo1 == 1 & cov$Condition == "Q&A"))
+p2 <- length(which(cov$DVMoreInfo1 == 1 & cov$Condition == "PSA"))
+n1 <- length(which(cov$Condition == "Q&A"))
+n2 <- length(which(cov$Condition == "PSA"))
+
+prop.test(c(p1, p2), c(n1, n2), correct = FALSE) 
+
+# Tricks for going out info
+p1 <- length(which(cov$DVTricksInfo == 1 & cov$Condition == "Q&A"))
+p2 <- length(which(cov$DVTricksInfo == 1 & cov$Condition == "PSA"))
+n1 <- length(which(cov$Condition == "Q&A"))
+n2 <- length(which(cov$Condition == "PSA"))
+
+prop.test(c(p1, p2), c(n1, n2), correct = FALSE) 
+
+# Risk info
+p1 <- length(which(cov$DVRiskInfo == 1 & cov$Condition == "Q&A"))
+p2 <- length(which(cov$DVRiskInfo == 1 & cov$Condition == "PSA"))
+n1 <- length(which(cov$Condition == "Q&A"))
+n2 <- length(which(cov$Condition == "PSA"))
+
+prop.test(c(p1, p2), c(n1, n2), correct = FALSE) 
+
+# More info #2
+p1 <- length(which(cov$DVMoreInfo2 == 1 & cov$Condition == "Q&A"))
+p2 <- length(which(cov$DVMoreInfo2 == 1 & cov$Condition == "PSA"))
+n1 <- length(which(cov$Condition == "Q&A"))
+n2 <- length(which(cov$Condition == "PSA"))
+
+prop.test(c(p1, p2), c(n1, n2), correct = FALSE) 
+
+p1 <- p1/n1
+sqrt(p1*(1 - p1)/length(which(cov$Condition == "Q&A")))
+p2 <- p2/n2
+sqrt(p2*(1 - p2)/length(which(cov$Condition == "PSA")))
+
+#Second, for our continuous DV’s, we also plan to run OLS regressions predicting the dependent variable with an indicator for treatment condition as our primary predictor variable. For our binary DV’s, we also plan to run OLS regressions with robust standard errors (to account for the binary DV) predicting the dependent variable with an indicator for treatment condition as our primary predictor variable.
+#For all regressions, we will include a control for how many days prior to the intervention start participants were recruited to participate (if this information is available to us). If this information is not available, we will control whether participants were recruited via in-person phone survey or IVR using an indicator variable that is “1” if participants were recruited via IVR and “0” otherwise.
+summary(lm(cov$DVLeaveHome_Main ~ cov$Condition + cov$RecruitDif))
+summary(lm(cov$DVPublicTransport_Main ~ cov$Condition + cov$RecruitDif))
+
+summary(lm(cov$DVBehaviorChange ~ cov$Condition + cov$RecruitDif))
+
+summary(lm(cov$InfoSeek ~ cov$Condition + cov$RecruitDif))
+
+summary(lm(cov$numberCount ~ cov$Condition + cov$RecruitDif))
+
+## Binary
+
+lmbNum <- lm(cov$DVNumber ~ cov$Condition + cov$RecruitDif)
+coeftest(lmbNum, vcov = vcovHC(lmbNum, "HC1")) 
+
+lmbHW <- lm(cov$DVHandWash_Main ~ cov$Condition + cov$RecruitDif)
+coeftest(lmbHW, vcov = vcovHC(lmbHW, "HC1"))
+
+lmbTI <- lm(cov$DVTricksInfo ~ cov$Condition + cov$RecruitDif)
+coeftest(lmbTI, vcov = vcovHC(lmbTI, "HC1"))
+
+lmbMI <- lm(cov$DVMaskInfo ~ cov$Condition + cov$RecruitDif)
+coeftest(lmbMI, vcov = vcovHC(lmbMI, "HC1"))
+
+lmbRI <- lm(cov$DVRiskInfo ~ cov$Condition + cov$RecruitDif)
+coeftest(lmbRI, vcov = vcovHC(lmbRI, "HC1"))
+
+lmbMore1 <- lm(cov$DVMoreInfo1 ~ cov$Condition + cov$RecruitDif)
+coeftest(lmbMore1, vcov = vcovHC(lmbMore1, "HC1"))
+
+
+# As a robustness check, we will use logistic regression as well as OLS regression for our models where the dependent variable is a binary variable.
+glmbNum <- glm(cov$DVNumber ~ cov$Condition + cov$RecruitDif, family = "binomial")
+summary(glmbNum)
+
+glmbHW <- glm(cov$DVHandWash_Main ~ cov$Condition + cov$RecruitDif, family = "binomial")
+summary(glmbHW)
+
+glmbTI <- glm(cov$DVTricksInfo ~ cov$Condition + cov$RecruitDif, family = "binomial")
+summary(glmbTI)
+
+glmbMI <- glm(cov$DVMaskInfo ~ cov$Condition + cov$RecruitDif, family = "binomial")
+summary(glmbMI)
+
+glmbRI <- glm(cov$DVRiskInfo ~ cov$Condition + cov$RecruitDif, family = "binomial")
+summary(glmbRI)
+
+glmbMore1 <- glm(cov$DVMoreInfo1 ~ cov$Condition + cov$RecruitDif, family = "binomial")
+summary(glmbMore1)
+
+#As a robustness check, for our continuous self-reported behavior dependent variables (i.e., using public transport and leaving home to visit friends or family), we will also handle missing values due to non-response in the following two ways:
+#(i) They will be replaced by the average response provided by participants who responded to the question.
+
+cov$DVPublicTransport_Robust1 <- 7-cov$DVPublicTransport
+cov$DVPublicTransport_Robust1[which(is.na(cov$DVPublicTransport_Robust1))] <- mean(cov$DVPublicTransport_Robust1[which(!is.na(cov$DVPublicTransport_Robust1))])
+cov$DVLeaveHome_Robust1 <- 7-cov$DVLeaveHome
+cov$DVLeaveHome_Robust1[which(is.na(cov$DVLeaveHome_Robust1))] <- mean(cov$DVLeaveHome_Robust1[which(!is.na(cov$DVLeaveHome_Robust1))])
+cov$DVPublicTransport_Robust1Z <- (cov$DVPublicTransport_Robust1-mean(cov$DVPublicTransport_Robust1))/sd(cov$DVPublicTransport_Robust1)
+cov$DVLeaveHome_Robust1Z <- (cov$DVLeaveHome_Robust1-mean(cov$DVLeaveHome_Robust1))/sd(cov$DVLeaveHome_Robust1)
+cov$DVBehaviorChange_Robust1 <- (cov$DVHandWash_MainZ + cov$DVLeaveHome_Robust1Z + cov$DVPublicTransport_Robust1Z)/3
+
+# un-reverse score and t-test
+cov$DVPublicTransport_Robust1 <- 7 - cov$DVPublicTransport_Robust1
+t.test(cov$DVPublicTransport_Robust1~cov$Condition)
+cov$DVLeaveHome_Robust1 <- 7 - cov$DVLeaveHome_Robust1
+t.test(cov$DVLeaveHome_Robust1 ~ cov$Condition) 
+
+# behavior change composite
+t.test(cov$DVBehaviorChange_Robust1 ~cov$Condition) 
+
+summary(lm(cov$DVLeaveHome_Robust1 ~ cov$Condition + cov$RecruitDif))
+summary(lm(cov$DVPublicTransport_Robust1~ cov$Condition + cov$RecruitDif))
+
+#(ii) They will be dropped.
+#Similarly, as a robustness check for our binary self-reported behavior dependent variables (i.e., washing hands and touching people outside the household), we will also drop missing values due to non-response. We will re-run our analyses with these alternative DVs.
+
+# response rates are so low that doing this seems silly
+cov2 <- cov[-which(is.na(cov$DVPublicTransport)),]
+t.test(cov2$DVPublicTransport~cov2$Condition)
+cov2 <- cov[-which(is.na(cov$DVLeaveHome)),]
+t.test(cov2$DVLeaveHome~cov2$Condition)
+cov2 <- cov[-which(is.na(cov$DVHandWash)),]
+summary(lm(cov2$DVHandWash~cov2$Condition))
+
+
+#We will test whether our Q&A treatment reduces attrition by comparing the proportion of participants who reply to our self-reported behavior change question on Weeks 1-4 across conditions, using both a proportions test and an OLS regression with robust standard errors as described above.
+
+cov$RespondedW1 <- ifelse(is.na(cov$DVPublicTransport), 0, 1)
+cov$RespondedW2 <- ifelse(is.na(cov$DVLeaveHome), 0, 1)
+cov$RespondedW3 <- ifelse(is.na(cov$DVHandWash), 0, 1)
+
+p1 <- length(which(cov$RespondedW1 == 1 & cov$Condition == "Q&A"))
+p2 <- length(which(cov$RespondedW1 == 1 & cov$Condition == "PSA"))
+n1 <- length(which(cov$Condition == "Q&A"))
+n2 <- length(which(cov$Condition == "PSA"))
+
+prop.test(c(p1, p2), c(n1, n2), correct = FALSE)
+
+p1 <- length(which(cov$RespondedW2 == 1 & cov$Condition == "Q&A"))
+p2 <- length(which(cov$RespondedW2 == 1 & cov$Condition == "PSA"))
+n1 <- length(which(cov$Condition == "Q&A"))
+n2 <- length(which(cov$Condition == "PSA"))
+
+prop.test(c(p1, p2), c(n1, n2), correct = FALSE) # directionally more responses in PSA, p = .101
+p1 <- length(which(cov$RespondedW3 == 1 & cov$Condition == "Q&A"))
+p2 <- length(which(cov$RespondedW3 == 1 & cov$Condition == "PSA"))
+n1 <- length(which(cov$Condition == "Q&A"))
+n2 <- length(which(cov$Condition == "PSA"))
+
+prop.test(c(p1, p2), c(n1, n2), correct = FALSE) # significantly more responded in Q&A
+```
+
+```{r 321 data}
+tto <- read.csv("IPA 321 List.csv")
+
+cov <- merge(cov, tto[,c("Subscriber.Phone", "Groups")], by.x = "ids", by.y = "Subscriber.Phone", all.x=TRUE)
+
+cov$Called321 <- 1
+cov$Called321[which(is.na(cov$Groups))] <- 0
+
+p1 <- length(which(cov$Called321 == 1 & cov$Condition == "Q&A"))
+p2 <- length(which(cov$Called321 == 1 & cov$Condition == "PSA"))
+n1 <- length(which(cov$Condition == "Q&A"))
+n2 <- length(which(cov$Condition == "PSA"))
+
+prop.test(c(p1, p2), c(n1, n2), correct = FALSE) # no difference
+
+```
+
